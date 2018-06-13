@@ -4,6 +4,9 @@ debug:
 test:
 	bundle exec rspec --fail-fast
 
+migrate:
+	bundle exec rake cab:migrate
+
 .PHONY: doc
 doc:
 	bundle exec yard doc --quiet
