@@ -1,0 +1,19 @@
+# Инфраструктура
+.idea
+.vagrant
+cm/roles
+cm/provisioning/roles
+cm/deploy/roles
+
+# Временные файлы
+tmp
+
+# Документация
+doc
+.yardoc
+
+# История команд IRB
+.irb_history
+
+# Docker Compose
+docker-compose.yml

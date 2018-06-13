@@ -1,0 +1,87 @@
+##Стадии сборки
+stages:
+  - build
+  - postgres
+  - test
+  - clean
+  - push
+
+##Формируем название образа контейнера
+variables:
+  IMAGE_NAME: repo.it2.vm/cab_mfc
+  PG_VERSION: 9.6.9
+
+##Сборка образа(commit)
+1.build_image:
+  stage: build
+  tags:
+    - shell
+  script:
+    - docker build -t $IMAGE_NAMEgI:$CI_COMMIT_SHA .
+
+##Публикация образа(commit)
+2.push_image:
+  stage: build
+  tags:
+    - shell
+  script:
+    - docker push $IMAGE_NAMEgI:$CI_COMMIT_SHA
+  when: on_success
+
+##запуск базы данных
+1.postgres_db_run:
+  stage: postgres
+  tags:
+    - shell
+  only:
+    - tags
+  script:
+    - docker run -d --name postgres_${CI_PIPELINE_ID} -l SERVICE_NAME=postgres_${CI_PIPELINE_ID} repo.it2.vm/databases/postgres_test:latest
+    - docker exec postgres_${CI_PIPELINE_ID} ./wait-for-it.sh -t 15 127.0.0.1:5432
+    - docker exec postgres_${CI_PIPELINE_ID} psql -h 127.0.0.1 -d test -U user_test --command 'create extension pg_trgm'
+
+##Тестирование rubocop
+1.rubocop_migrate_rspec:
+  stage: test
+  variables:
+    RACK_ENV: test
+    CAB_LOG_LEVEL: debug
+    CAB_DB_NAME: test
+    CAB_DB_HOST: postgres_${CI_PIPELINE_ID}.service.consul
+    CAB_DB_USER: user_test
+    CAB_DB_PASS: 123456
+  image:
+    name: $IMAGE_NAMEgI:$CI_COMMIT_SHA
+  only:
+    - tags
+  tags:
+    - docker
+  script:
+    - bundle install --with test
+    - bundle exec rubocop
+    - bundle exec rake cab:migrate
+    - bundle exec rspec --fail-fast
+
+##Удаление контейнера базы данных
+1.clean_postgres:
+  stage: clean
+  tags:
+    - shell
+  only:
+    - tags
+  script:
+    - docker stop postgres_${CI_PIPELINE_ID}
+    - docker rm postgres_${CI_PIPELINE_ID}
+  when: always
+  allow_failure: true
+
+##Сборка контейнера с тагом и публикация
+1.build_tag_and_push:
+  stage: push
+  tags:
+    - shell
+  only:
+    - tags
+  script:
+    - docker build -t $IMAGE_NAME:$CI_COMMIT_TAG .
+    - docker push $IMAGE_NAME:$CI_COMMIT_TAG

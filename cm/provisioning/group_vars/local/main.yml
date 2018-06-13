@@ -1,0 +1,39 @@
+---
+apt_packages:
+  - libpq-dev
+  - mc
+  - vim
+  - ruby2.4-dev
+  - g++
+
+ruby_version: 2.4
+
+postgresql_version: 9.5
+
+postgresql_databases:
+  - name: cab
+    owner: user_cab
+  - name: cab_test
+    owner: user_cab
+
+postgresql_database_extensions:
+  - db: cab
+    extensions:
+      - pg_trgm
+  - db: cab_test
+    extensions:
+      - pg_trgm
+
+postgresql_users:
+  - name: user_cab
+    pass: 123456
+
+postgresql_user_privileges:
+  - name: user_cab
+    db: cab
+    priv: "ALL"
+    role_attr_flags: "SUPERUSER"
+  - name: user_cab
+    db: cab_test
+    priv: "ALL"
+    role_attr_flags: "SUPERUSER"
