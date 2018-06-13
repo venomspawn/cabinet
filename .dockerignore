@@ -1,0 +1,9 @@
+.dockerignore
+.git
+.gitignore
+cm
+Dockerfile
+Vagrantfile
+*.md
+docker-compose.yml
+docs

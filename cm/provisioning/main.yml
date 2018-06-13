@@ -1,0 +1,26 @@
+# Окружение для разработки
+---
+- hosts: local
+  become: yes
+
+  pre_tasks:
+    - name: "Autofollow to project on logon"
+      lineinfile:
+        dest: "/home/vagrant/.bashrc"
+        regexp: "^cd /vagrant"
+        line: "cd /vagrant"
+    - name: "Set env variable"
+      lineinfile:
+        dest: "/home/vagrant/.bashrc"
+        regexp: "^export {{ item.var }}="
+        line: "export {{ item.var }}={{ item.value }}"
+      with_items:
+      - { var: "PGUSER", value: "user_cab"}
+      - { var: "PGDATABASE", value: "cab"}
+      - { var: "RACK_ENV", value: "development" }
+
+  roles:
+    - role: ruby-brightbox
+    - role: apt
+    - role: postgresql
+    - role: ntp
