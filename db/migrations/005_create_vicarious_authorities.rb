@@ -12,7 +12,7 @@ Sequel.migration do
       column :registry_number, :text
       column :issued_by,       :text, null: false
       column :issue_date,      :date, null: false
-      column :expiration_date,  :date
+      column :expiration_date, :date
       column :content,         :bytea, null: false
     end
   end

@@ -27,6 +27,8 @@ db.sql_log_level = :debug
 # Подключение поддержки перечислимых типов Postgres. Важно, что подключение
 # расширения pg_enum идёт после подключения расширения Sequel migration.
 db.extension :pg_enum
+# Поддержка JSON
+db.extension :pg_json
 
 # Настройка моделей
 # Установка базу данных для моделей. Через свойство Sequel::Model.db в
@@ -35,6 +37,9 @@ Sequel::Model.db = db
 # Подключение поддержки генерации исключений
 Sequel::Model.raise_on_save_failure = true
 Sequel::Model.raise_on_typecast_failure = true
+# Плагин, который обрезает пробелы в начале и конце строки при установке
+# строкового поля
+Sequel::Model.plugin :string_stripper
 
 # Загрузка моделей
 Cab.need 'models/*.rb'
