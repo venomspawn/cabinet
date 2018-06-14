@@ -1,0 +1,16 @@
+---
+default: &default
+  adapter: postgres
+  user: <%= ENV['CAB_DB_USER'] %>
+  password: "<%= ENV['CAB_DB_PASS'] %>"
+  host: <%= ENV['CAB_DB_HOST'] %>
+  database: <%= ENV['CAB_DB_NAME'] %>
+
+development:
+  <<: *default
+
+production:
+  <<: *default
+
+test:
+  <<: *default
