@@ -82,9 +82,6 @@ module Cab
   # Расширение файлов исходного кода
   RB_EXT = '.rb'
 
-  # Процедура загрузки файла исходного кода
-  REQUIRE = method(:require).to_proc
-
   # Загружает один или несколько файлов исходного кода согласно маске,
   # включающей в себя частичный путь от директории по пути {lib}. Добавляет в
   # конец маски строку `.rb`, если она отсутствует. Не создаёт исключений, если
@@ -101,6 +98,12 @@ module Cab
   def self.need(mask)
     mask = mask.to_s
     mask = "#{mask}.rb" unless mask.end_with?(RB_EXT)
-    Dir["#{lib}/#{mask}"].each(&REQUIRE)
+    Dir["#{lib}/#{mask}"].each do |filepath|
+      begin
+        require filepath
+      rescue StandardError
+        nil
+      end
+    end
   end
 end

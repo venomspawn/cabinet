@@ -6,7 +6,7 @@ Sequel.migration do
   change do
     create_table(:entrepreneurs) do
       column :id,              :uuid, primary_key: true
-      column :commerical_name, :text
+      column :commercial_name, :text
       column :ogrn,            :text, null: false
       column :bank_details,    :jsonb
       column :actual_address,  :jsonb, null: false
