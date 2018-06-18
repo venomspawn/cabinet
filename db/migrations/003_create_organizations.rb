@@ -16,6 +16,7 @@ Sequel.migration do
       column :legal_address,     :jsonb, null: false
       column :actual_address,    :jsonb
       column :bank_details,      :jsonb
+      column :created_at,        :timestamp, null: false
 
       constraint :organizations_inn_format, :inn.like(/^[0-9]{10}$/)
       constraint :organizations_kpp_format, :kpp.like(/^[0-9]{9}$/)

@@ -144,6 +144,28 @@ RSpec.describe Cab::Models::VicariousAuthority do
           expect { subject }.to raise_error(Sequel::InvalidValue)
         end
       end
+
+      context 'when value of `created_at` property is nil' do
+        let(:params) { attributes_for(:vicarious_authority, traits) }
+        let(:traits) { { created_at: value } }
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+
+      context 'when value of `created_at` property is of String' do
+        context 'when the value is not a time\'s representation' do
+          let(:params) { attributes_for(:vicarious_authority, traits) }
+          let(:traits) { { created_at: value } }
+          let(:value) { 'not a time\'s representation' }
+
+          it 'should raise Sequel::InvalidValue' do
+            expect { subject }.to raise_error(Sequel::InvalidValue)
+          end
+        end
+      end
     end
   end
 
@@ -159,6 +181,7 @@ RSpec.describe Cab::Models::VicariousAuthority do
       issued_by
       issue_date
       expiration_date
+      created_at
       update
     ]
 
@@ -306,6 +329,18 @@ RSpec.describe Cab::Models::VicariousAuthority do
       subject { result }
 
       it { is_expected.to be_a(String) }
+    end
+  end
+
+  describe '#created_at' do
+    subject(:result) { instance.created_at }
+
+    let(:instance) { create(:vicarious_authority) }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to be_a(Time) }
     end
   end
 
@@ -509,6 +544,49 @@ RSpec.describe Cab::Models::VicariousAuthority do
 
         it 'should set `content` attribute of the instance to the value' do
           expect { subject }.to change { instance.content }.to(value)
+        end
+      end
+
+      context 'when the value is nil' do
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+    end
+
+    context 'when `created_at` property is present in parameters' do
+      let(:params) { { created_at: value } }
+
+      context 'when the value is of String' do
+        context 'when the value is a time\'s representation' do
+          before { subject }
+
+          let(:value) { created_at.to_s }
+          let(:created_at) { Time.now - 1 }
+
+          it 'should set `created_at` attribute to the date' do
+            expect(instance.created_at).to be_within(1).of(created_at)
+          end
+        end
+
+        context 'when the value is not a time\'s representation' do
+          let(:value) { 'not a time\'s representation' }
+
+          it 'should raise Sequel::InvalidValue' do
+            expect { subject }.to raise_error(Sequel::InvalidValue)
+          end
+        end
+      end
+
+      context 'when the value is of Time' do
+        before { subject }
+
+        let(:value) { Time.now - 1 }
+
+        it 'should set `created_at` attribute to the value' do
+          expect(instance.created_at).to be_within(1).of(value)
         end
       end
 

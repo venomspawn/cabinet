@@ -51,6 +51,28 @@ RSpec.describe Cab::Models::IndividualSpokesman do
         end
       end
 
+      context 'when value of `created_at` property is nil' do
+        let(:params) { attributes_for(:individual_spokesman, traits) }
+        let(:traits) { { created_at: nil } }
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+
+      context 'when value of `created_at` property is of String' do
+        context 'when the value is not a time\'s representation' do
+          let(:params) { attributes_for(:individual_spokesman, traits) }
+          let(:traits) { { created_at: value } }
+          let(:value) { 'not a time\'s representation' }
+
+          it 'should raise Sequel::InvalidValue' do
+            expect { subject }.to raise_error(Sequel::InvalidValue)
+          end
+        end
+      end
+
       context 'when value of `spokesman_id` property is nil' do
         let(:params) { attributes_for(:individual_spokesman, traits) }
         let(:traits) { { spokesman_id: value } }
@@ -120,10 +142,27 @@ RSpec.describe Cab::Models::IndividualSpokesman do
     subject { create(:individual_spokesman) }
 
     methods = %i[
-      spokesman_id individual_id vicarious_authority_id destroy update
+      created_at
+      spokesman_id
+      individual_id
+      vicarious_authority_id
+      destroy
+      update
     ]
 
     it { is_expected.to respond_to(*methods) }
+  end
+
+  describe '#created_at' do
+    subject(:result) { instance.created_at }
+
+    let(:instance) { create(:individual_spokesman) }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to be_a(Time) }
+    end
   end
 
   describe '#spokesman_id' do
@@ -197,7 +236,7 @@ RSpec.describe Cab::Models::IndividualSpokesman do
     subject { instance.destroy }
 
     let(:instance) { create(:individual_spokesman) }
-    let(:pkey) { instance.values }
+    let(:pkey) { instance.pk }
     let(:model) { Cab::Models::IndividualSpokesman }
 
     it 'should delete the record' do

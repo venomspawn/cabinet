@@ -18,5 +18,6 @@ FactoryBot.define do
     residence_address      { create(:address) }
     temp_residence_address { create(:address) }
     agreement              { create(:string) }
+    created_at             { Time.now }
   end
 end

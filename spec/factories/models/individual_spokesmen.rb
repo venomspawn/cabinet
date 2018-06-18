@@ -4,6 +4,7 @@
 
 FactoryBot.define do
   factory :individual_spokesman, class: Cab::Models::IndividualSpokesman do
+    created_at             { Time.now }
     spokesman_id           { create(:individual).id }
     individual_id          { create(:individual).id }
     vicarious_authority_id { create(:vicarious_authority).id }

@@ -14,6 +14,7 @@ Sequel.migration do
       column :issue_date,      :date, null: false
       column :expiration_date, :date
       column :content,         :bytea, null: false
+      column :created_at,      :timestamp, null: false
     end
   end
 end

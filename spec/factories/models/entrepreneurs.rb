@@ -9,6 +9,7 @@ FactoryBot.define do
     ogrn            { create(:string, length: 15) }
     bank_details    { create(:bank_details) }
     actual_address  { create(:address) }
+    created_at      { Time.now }
     individual_id   { create(:individual).id }
   end
 end

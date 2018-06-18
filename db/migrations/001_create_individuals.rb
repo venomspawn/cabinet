@@ -22,6 +22,7 @@ Sequel.migration do
       column :residence_address,      :jsonb, null: false
       column :temp_residence_address, :jsonb
       column :agreement,              :bytea, null: false
+      column :created_at,             :timestamp, null: false
 
       constraint :individuals_snils_format,
                  :snils.like(/^[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}$/)
