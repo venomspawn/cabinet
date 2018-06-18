@@ -162,9 +162,9 @@ RSpec.describe Cab::Models::Individual do
       end
 
       context 'when value of `citizenship` property is of String' do
-        context 'when the value is not `russian`, `foreigner` nor `absent`' do
+        context 'when the value is not `russian`, `foreign` nor `absent`' do
           let(:params) { attributes_for(:individual, citizenship: value) }
-          let(:value) { '`russian`, `foreigner` nor `absent`' }
+          let(:value) { '`russian`, `foreign` nor `absent`' }
 
           it 'should raise Sequel::DatabaseError' do
             expect { subject }.to raise_error(Sequel::DatabaseError)
@@ -384,10 +384,10 @@ RSpec.describe Cab::Models::Individual do
         it { is_expected.to be == 'russian' }
       end
 
-      context 'when `citizenship` field is `foreigner`' do
-        let(:instance) { create(:individual, citizenship: 'foreigner') }
+      context 'when `citizenship` field is `foreign`' do
+        let(:instance) { create(:individual, citizenship: 'foreign') }
 
-        it { is_expected.to be == 'foreigner' }
+        it { is_expected.to be == 'foreign' }
       end
 
       context 'when `citizenship` field is `absent`' do
@@ -708,8 +708,8 @@ RSpec.describe Cab::Models::Individual do
           end
         end
 
-        context 'when the value is `foreigner`' do
-          let(:value) { 'foreigner' }
+        context 'when the value is `foreign`' do
+          let(:value) { 'foreign' }
           let(:instance) { create(:individual, citizenship: 'absent') }
 
           it 'should set `citizenship` attribute to the value' do
@@ -719,15 +719,15 @@ RSpec.describe Cab::Models::Individual do
 
         context 'when the value is `absent`' do
           let(:value) { 'absent' }
-          let(:instance) { create(:individual, citizenship: 'foreigner') }
+          let(:instance) { create(:individual, citizenship: 'foreign') }
 
           it 'should set `citizenship` attribute to the value' do
             expect { subject }.to change { instance.citizenship }.to(value)
           end
         end
 
-        context 'when the value is not `russian`, `foreigner` nor `absent`' do
-          let(:value) { '`russian`, `foreigner` nor `absent`' }
+        context 'when the value is not `russian`, `foreign` nor `absent`' do
+          let(:value) { '`russian`, `foreign` nor `absent`' }
 
           it 'should raise Sequel::DatabaseError' do
             expect { subject }.to raise_error(Sequel::DatabaseError)

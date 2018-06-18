@@ -11,7 +11,7 @@ FactoryBot.define do
     birth_place            { create(:string) }
     birthday               { create(:date) }
     sex                    { create(:enum, values: %w[male female]) }
-    citizenship            { create(:enum, values: %w[russian foreigner]) }
+    citizenship            { create(:enum, values: %w[russian foreign]) }
     snils                  { create(:snils) }
     inn                    { create(:string, length: 12) }
     registration_address   { create(:address) }
