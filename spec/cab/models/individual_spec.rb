@@ -607,7 +607,7 @@ RSpec.describe Cab::Models::Individual do
       context 'when the value is of Date' do
         let(:value) { create(:date) }
 
-        it 'should set `birth_place` attribute of the instance to the value' do
+        it 'should set `birthday` attribute of the instance to the value' do
           expect { subject }.to change { instance.birthday }.to(value)
         end
       end

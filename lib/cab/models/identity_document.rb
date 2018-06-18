@@ -44,6 +44,21 @@ module Cab
     #   @return [String]
     #     идентификатор записи физического лица
     class IdentityDocument < Sequel::Model
+      # Типы документов
+      TYPES = %i[
+        foreign_citizen_passport
+        residence
+        temporary_residence
+        refugee_certificate
+        certificate_of_temporary_asylum_rf
+        passport_rf
+        international_passport
+        seaman_passport
+        officer_identity_document
+        soldier_identity_document
+        temporary_identity_card
+        birth_certificate
+      ].freeze
     end
   end
 end
