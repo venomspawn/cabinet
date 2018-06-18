@@ -13,7 +13,7 @@ Sequel.migration do
                   on_delete: :cascade,
                   on_update: :cascade
 
-      foreign_key :entreprenur_id, :entrepreneurs,
+      foreign_key :entrepreneur_id, :entrepreneurs,
                   type:      :uuid,
                   null:      false,
                   index:     true,
@@ -26,6 +26,9 @@ Sequel.migration do
                   index:     true,
                   on_delete: :cascade,
                   on_update: :cascade
+
+      primary_key %i[spokesman_id entrepreneur_id vicarious_authority_id],
+                  name: :entrepreneur_spokesmen_pkey
     end
   end
 end

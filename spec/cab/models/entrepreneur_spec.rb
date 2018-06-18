@@ -133,7 +133,7 @@ RSpec.describe Cab::Models::Entrepreneur do
         end
       end
 
-      context 'when value of `individual_id` is not an primary key' do
+      context 'when value of `individual_id` is not a primary key' do
         let(:params) { attributes_for(:entrepreneur, individual_id: value) }
         let(:value) { create(:uuid) }
 
