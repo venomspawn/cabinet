@@ -29,6 +29,7 @@ Sequel.migration do
       column :expiration_end, :date
       column :division_code,  :text
       column :content,        :bytea, null: false
+      column :created_at,     :timestamp, null: false
 
       foreign_key :individual_id, :individuals,
                   type:      :uuid,

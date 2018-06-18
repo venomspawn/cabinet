@@ -10,6 +10,7 @@ Sequel.migration do
       column :ogrn,            :text, null: false
       column :bank_details,    :jsonb
       column :actual_address,  :jsonb, null: false
+      column :created_at,      :timestamp, null: false
 
       constraint :entrepreneurs_ogrn_format, :ogrn.like(/^[0-9]{15}$/)
 

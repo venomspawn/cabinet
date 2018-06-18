@@ -6,6 +6,8 @@
 Sequel.migration do
   change do
     create_table(:organization_spokesmen) do
+      column :created_at, :timestamp, null: false
+
       foreign_key :spokesman_id, :individuals,
                   type:      :uuid,
                   null:      false,
