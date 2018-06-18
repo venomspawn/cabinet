@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Запуск сервиса
+
+require_relative '../config/app_init.rb'
+
+Cab::Init.run!
+Cab::API::REST::Controller.run!

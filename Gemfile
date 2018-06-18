@@ -4,9 +4,13 @@ source 'http://repo.it2.vm/repository/gem-group'
 
 gem 'activesupport'
 gem 'dotenv'
+gem 'json-schema'
+gem 'oj'
 gem 'rake'
 gem 'sequel'
 gem 'sequel_pg'
+gem 'sinatra'
+gem 'thin'
 
 group :development, :test do
   gem 'awesome_print'
@@ -17,5 +21,10 @@ end
 
 group :test do
   gem 'database_cleaner'
+  gem 'rack-test'
   gem 'rubocop'
+end
+
+group :production do
+  gem 'puma'
 end
