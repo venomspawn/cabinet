@@ -13,5 +13,6 @@ FactoryBot.define do
     issue_date      { create(:date) }
     expiration_date { create(:date) }
     content         { create(:string) }
+    created_at      { Time.now }
   end
 end

@@ -15,5 +15,6 @@ FactoryBot.define do
     legal_address     { create(:address) }
     actual_address    { create(:address) }
     bank_details      { create(:bank_details) }
+    created_at        { Time.now }
   end
 end

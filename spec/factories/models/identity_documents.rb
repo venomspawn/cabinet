@@ -15,6 +15,7 @@ FactoryBot.define do
     expiration_end { create(:date) }
     division_code  { create(:string) }
     content        { create(:string) }
+    created_at     { Time.now }
     individual_id  { create(:individual).id }
   end
 end
