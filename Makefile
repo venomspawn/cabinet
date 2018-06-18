@@ -1,3 +1,6 @@
+run:
+	bundle exec bin/app
+
 debug:
 	bundle exec bin/irb_debug
 
