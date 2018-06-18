@@ -5,7 +5,7 @@
 Sequel.migration do
   change do
     create_enum :sex, %i[male female]
-    create_enum :citizenship, %i[russian foreigner absent]
+    create_enum :citizenship, %i[russian foreign absent]
 
     create_table(:individuals) do
       column :id,                     :uuid, primary_key: true
