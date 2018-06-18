@@ -26,6 +26,9 @@ Sequel.migration do
                   index:     true,
                   on_delete: :cascade,
                   on_update: :cascade
+
+      primary_key %i[spokesman_id individual_id vicarious_authority_id],
+                  name: :individual_spokesmen_pkey
     end
   end
 end
