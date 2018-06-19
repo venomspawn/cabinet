@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# Тестирование действий над записями физических лиц
+# Тестирование действий над записями индивидуальных предпринимателей
 
-RSpec.describe Cab::Actions::Individuals do
+RSpec.describe Cab::Actions::Entrepreneurs do
   describe 'the module' do
     subject { described_class }
 
@@ -18,10 +18,10 @@ RSpec.describe Cab::Actions::Individuals do
       subject { result }
 
       let(:params) { { id: id, extended: extended } }
-      let(:id) { individual.id }
-      let(:individual) { create(:individual) }
+      let(:id) { entrepreneur.id }
+      let(:entrepreneur) { create(:entrepreneur) }
       let!(:identity_documents) { create_list(:identity_document, 2, traits) }
-      let(:traits) { { individual_id: id } }
+      let(:traits) { { individual_id: entrepreneur.individual_id } }
 
       context 'when `extended` is boolean false' do
         let(:extended) { false }

@@ -13,7 +13,7 @@ module Cab
         #   результирующий ассоциативный массив
         def show
           values.tap do |result|
-            result[:client_type] = 'individual'
+            result[:client_type] = :individual
             expand_json(result, :registration_address)
             expand_json(result, :residential_address)
             next unless extended?
