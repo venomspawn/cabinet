@@ -15,10 +15,18 @@ module Cab
     #   Сокращённое наименование
     #   @return [NilClass, String]
     #     сокращённое наименование
-    # @!attribute director
+    # @!attribute chief_name
     #   Имя руководителя
     #   @return [String]
     #     имя руководителя
+    # @!attribute chief_surname
+    #   Фамилия руководителя
+    #   @return [String]
+    #     фамилия руководителя
+    # @!attribute chief_middle_name
+    #   Отчество руководителя
+    #   @return [NilClass, String]
+    #     отчество руководителя
     # @!attribute registration_date
     #   Дата регистрации
     #   @return [Date]
@@ -47,6 +55,10 @@ module Cab
     #   Банковские реквизиты
     #   @return [Object]
     #     банковские реквизиты
+    # @!attribute created_at
+    #   Дата и время создания
+    #   @return [Time]
+    #     дата и время создания
     class Organization < Sequel::Model
     end
   end

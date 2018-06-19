@@ -94,8 +94,17 @@ RSpec.describe Cab::Models::Organization do
         end
       end
 
-      context 'when value of `director` property is nil' do
-        let(:params) { attributes_for(:organization, director: value) }
+      context 'when value of `chief_name` property is nil' do
+        let(:params) { attributes_for(:organization, chief_name: value) }
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+
+      context 'when value of `chief_surname` property is nil' do
+        let(:params) { attributes_for(:organization, chief_surname: value) }
         let(:value) { nil }
 
         it 'should raise Sequel::InvalidValue' do
@@ -224,7 +233,9 @@ RSpec.describe Cab::Models::Organization do
       id
       full_name
       short_name
-      director
+      chief_name
+      chief_surname
+      chief_middle_name
       registration_date
       inn
       kpp
@@ -287,8 +298,8 @@ RSpec.describe Cab::Models::Organization do
     end
   end
 
-  describe '#director' do
-    subject(:result) { instance.director }
+  describe '#chief_name' do
+    subject(:result) { instance.chief_name }
 
     let(:instance) { create(:organization) }
 
@@ -296,6 +307,38 @@ RSpec.describe Cab::Models::Organization do
       subject { result }
 
       it { is_expected.to be_a(String) }
+    end
+  end
+
+  describe '#chief_surname' do
+    subject(:result) { instance.chief_surname }
+
+    let(:instance) { create(:organization) }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to be_a(String) }
+    end
+  end
+
+  describe '#chief_middle_name' do
+    subject(:result) { instance.chief_middle_name }
+
+    let(:instance) { create(:organization) }
+
+    describe 'result' do
+      subject { result }
+
+      context 'when `chief_middle_name` field is NULL' do
+        let(:instance) { create(:organization, chief_middle_name: nil) }
+
+        it { is_expected.to be_nil }
+      end
+
+      context 'when `chief_middle_name` field isn\'t NULL' do
+        it { is_expected.to be_a(String) }
+      end
     end
   end
 
@@ -457,34 +500,34 @@ RSpec.describe Cab::Models::Organization do
       end
     end
 
-    context 'when `short_name` property is present in parameters' do
-      let(:params) { { short_name: value } }
+    context 'when `chief_middle_name` property is present in parameters' do
+      let(:params) { { chief_middle_name: value } }
 
       context 'when the value is of String' do
         let(:value) { create(:string) }
 
-        it 'should set `short_name` attribute of the instance to the value' do
-          expect { subject }.to change { instance.short_name }.to(value)
+        it 'should set `chief_middle_name` attribute of the instance to the value' do
+          expect { subject }.to change { instance.chief_middle_name }.to(value)
         end
       end
 
       context 'when the value is nil' do
         let(:value) { nil }
 
-        it 'should set `short_name` attribute of the instance to nil' do
-          expect { subject }.to change { instance.short_name }.to(nil)
+        it 'should set `chief_middle_name` attribute of the instance to nil' do
+          expect { subject }.to change { instance.chief_middle_name }.to(nil)
         end
       end
     end
 
-    context 'when `director` property is present in parameters' do
-      let(:params) { { director: value } }
+    context 'when `chief_name` property is present in parameters' do
+      let(:params) { { chief_name: value } }
 
       context 'when the value is of String' do
         let(:value) { create(:string) }
 
-        it 'should set `director` attribute of the instance to the value' do
-          expect { subject }.to change { instance.director }.to(value)
+        it 'should set `chief_name` attribute of the instance to the value' do
+          expect { subject }.to change { instance.chief_name }.to(value)
         end
       end
 
@@ -493,6 +536,46 @@ RSpec.describe Cab::Models::Organization do
 
         it 'should raise Sequel::InvalidValue' do
           expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+    end
+
+    context 'when `chief_surname` property is present in parameters' do
+      let(:params) { { chief_surname: value } }
+
+      context 'when the value is of String' do
+        let(:value) { create(:string) }
+
+        it 'should set `chief_surname` attribute to the value' do
+          expect { subject }.to change { instance.chief_surname }.to(value)
+        end
+      end
+
+      context 'when the value is nil' do
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+    end
+
+    context 'when `chief_middle_name` property is present in parameters' do
+      let(:params) { { chief_middle_name: value } }
+
+      context 'when the value is of String' do
+        let(:value) { create(:string) }
+
+        it 'should set `chief_middle_name` attribute to the value' do
+          expect { subject }.to change { instance.chief_middle_name }.to(value)
+        end
+      end
+
+      context 'when the value is nil' do
+        let(:value) { nil }
+
+        it 'should set `chief_middle_name` attribute of the instance to nil' do
+          expect { subject }.to change { instance.chief_middle_name }.to(nil)
         end
       end
     end

@@ -60,6 +60,10 @@ module Cab
     #   Содержимое файла с соглашением на обработку персональных данных
     #   @return [String]
     #     содержимое файла с соглашением на обработку персональных данных
+    # @!attribute created_at
+    #   Дата и время создания
+    #   @return [Time]
+    #     дата и время создания
     class Individual < Sequel::Model
     end
   end

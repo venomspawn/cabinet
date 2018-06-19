@@ -7,7 +7,9 @@ FactoryBot.define do
     id                { create(:uuid) }
     full_name         { create(:string) }
     short_name        { create(:string) }
-    director          { create(:string) }
+    chief_name        { create(:string) }
+    chief_surname     { create(:string) }
+    chief_middle_name { create(:string) }
     registration_date { create(:date) }
     inn               { create(:string, length: 10) }
     kpp               { create(:string, length: 9) }
