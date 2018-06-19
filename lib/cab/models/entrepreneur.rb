@@ -23,6 +23,10 @@ module Cab
     #   Фактический адрес
     #   @return [Object]
     #     фактический адрес
+    # @!attribute created_at
+    #   Дата и время создания
+    #   @return [Time]
+    #     дата и время создания
     # @!attribute individual_id
     #   Идентификатор записи физического лица
     #   @return [String]

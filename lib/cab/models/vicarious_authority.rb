@@ -39,6 +39,10 @@ module Cab
     #   Содержимое файла
     #   @return [String]
     #     содержимое файла
+    # @!attribute created_at
+    #   Дата и время создания
+    #   @return [Time]
+    #     дата и время создания
     class VicariousAuthority < Sequel::Model
     end
   end

@@ -3,6 +3,10 @@
 module Cab
   module Models
     # Модель записи связи между записями физических лиц и их представителей
+    # @!attribute created_at
+    #   Дата и время создания
+    #   @return [Time]
+    #     дата и время создания
     # @!attribute spokesman_id
     #   Идентификатор записи представителя
     #   @return [String]

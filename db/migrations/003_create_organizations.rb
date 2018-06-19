@@ -8,7 +8,9 @@ Sequel.migration do
       column :id,                :uuid, primary_key: true
       column :full_name,         :text, null: false
       column :short_name,        :text
-      column :director,          :text, null: false
+      column :chief_name,        :text, null: false
+      column :chief_surname,     :text, null: false
+      column :chief_middle_name, :text
       column :registration_date, :date, null: false
       column :inn,               :text, null: false
       column :kpp,               :text, null: false
