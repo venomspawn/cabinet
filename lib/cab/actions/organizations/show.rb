@@ -34,7 +34,7 @@ module Cab
         # юридического лица
         REGISTRATION_DATE =
           :to_char
-          .sql_function(:registration_date, 'YYYY-MM-DD')
+          .sql_function(:registration_date, 'DD.MM.YYYY')
           .as(:registration_date)
 
         # Названия полей записи физического лица, извлекаемых из базы данных

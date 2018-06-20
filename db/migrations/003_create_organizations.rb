@@ -20,6 +20,16 @@ Sequel.migration do
       column :bank_details,      :jsonb
       column :created_at,        :timestamp, null: false
 
+      index :full_name,
+            name:    :organizations_full_name_trgm_index,
+            type:    :gist,
+            opclass: :gist_trgm_ops
+
+      index :legal_address,
+            name:    :organizations_legal_address_path_index,
+            type:    :gin,
+            opclass: :jsonb_path_ops
+
       constraint :organizations_inn_format, :inn.like(/^[0-9]{10}$/)
       constraint :organizations_kpp_format, :kpp.like(/^[0-9]{9}$/)
       constraint :organizations_ogrn_format, :ogrn.like(/^[0-9]{13}$/)

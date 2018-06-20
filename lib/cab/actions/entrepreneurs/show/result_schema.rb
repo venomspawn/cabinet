@@ -9,6 +9,7 @@ module Cab
           type: :object,
           properties: {
             client_type: {
+              type: :string,
               enum: %w[entrepreneur]
             },
             id: {
