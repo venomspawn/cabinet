@@ -54,7 +54,7 @@ RSpec.describe Cab::Actions::Applicants do
           end
         end
 
-        context 'when `extended` isn\'t the string `false` nor boolean false' do
+        context 'when `extended` isn\'t string `false` nor boolean false' do
           let(:extended) { 'not the string `false` nor boolean false' }
 
           it { is_expected.to match_json_schema(schema) }
@@ -103,7 +103,7 @@ RSpec.describe Cab::Actions::Applicants do
           end
         end
 
-        context 'when `extended` isn\'t the string `false` nor boolean false' do
+        context 'when `extended` isn\'t string `false` nor boolean false' do
           let(:extended) { 'not the string `false` nor boolean false' }
 
           it { is_expected.to match_json_schema(schema) }
