@@ -101,8 +101,11 @@ module Cab
     Dir["#{lib}/#{mask}"].each do |filepath|
       begin
         require filepath
-      rescue StandardError
-        nil
+      rescue StandardError => error
+        puts <<-MESSAGE.squish
+          При загрузке файла по пути `#{filepath}` произошла ошибка
+          `#{error.class}`: `#{error.message}`
+        MESSAGE
       end
     end
   end
