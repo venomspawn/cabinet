@@ -26,7 +26,7 @@ module Cab
           :middle_name,
           :birth_place,
           :to_char.sql_function(:birthday, 'DD.MM.YYYY').as(:birth_date)
-        ]
+        ].freeze
 
         # Количество записей
         LIMIT = 10
@@ -41,7 +41,7 @@ module Cab
           birth_place: :birth_place,
           inn:         :inn,
           snils:       :snils
-        }
+        }.freeze
 
         # Возвращает значение параметра `last_name`
         # @return [Object]
@@ -97,18 +97,19 @@ module Cab
             .select(*FIELDS)
             .where(search_params_without_last_name)
             .exclude(surname: last_name)
-            .limit(LIMIT).to_a
+            .limit(LIMIT)
+            .to_a
         end
 
         # Названия параметров поиска, по которым производится нечёткий поиск
-        FUZZY_KEYS = %i[first_name middle_name last_name birth_place]
+        FUZZY_KEYS = %i[first_name middle_name last_name birth_place].freeze
 
         # Возвращает пустой список, если список, возвращаемый методом {exact},
         # не пуст или все параметры поиска, отвечающие имени, фамилии, отчеству
         # и месту рождения, пусты. В противном случае возвращает список
         # ассоциативных массивов с информацией о физических лицах, найденной по
-        # точному совпадению даты рождению и по неточному совпадению по
-        # фамилии, имени, отчеству и месту рождения.
+        # точному совпадению даты рождения и по неточному совпадению фамилии,
+        # имени, отчества и места рождения.
         # @return [Array]
         #   результирующий список
         def fuzzy
@@ -152,7 +153,7 @@ module Cab
           first_name:  1.5,
           middle_name: 2.0,
           birth_place: 1.8
-        }
+        }.freeze
 
         # Возвращает выражение Sequel для вычисления общей похожести
         # @return [Sequel::SQL::Expression]
@@ -174,6 +175,8 @@ module Cab
         #   строка
         # @param [#to_s] weight
         #   вес
+        # @return [Sequel::SQL::Expression]
+        #   результирующее выражение Sequel
         def similarity_distance(field, value, weight)
           Sequel.lit("(\"#{field}\" <-> '#{value}') * #{weight}")
         end
