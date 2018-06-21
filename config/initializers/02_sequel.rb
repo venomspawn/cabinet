@@ -11,6 +11,8 @@ require 'yaml'
 Sequel.extension :migration
 # 2) расширения базовых классов
 Sequel.extension :core_extensions
+# 3) поддержка операций над JSON-типами
+Sequel.extension :pg_json_ops
 
 # Инициализация подключения к базе данных
 # Загрузка настройки базы данных

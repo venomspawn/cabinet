@@ -39,7 +39,7 @@ module Cab
           :surname.as(:last_name),
           :middle_name,
           :birth_place,
-          :to_char.sql_function(:birthday, 'YYYY-MM-DD').as(:birth_date),
+          :to_char.sql_function(:birthday, 'DD.MM.YYYY').as(:birth_date),
           :sex,
           :citizenship,
           :inn,
@@ -81,8 +81,8 @@ module Cab
           :number,
           :series,
           :issued_by,
-          :to_char.sql_function(:issue_date, 'YYYY-MM-DD').as(:issue_date),
-          :to_char.sql_function(:expiration_end, 'YYYY-MM-DD').as(:due_date),
+          :to_char.sql_function(:issue_date, 'DD.MM.YYYY').as(:issue_date),
+          :to_char.sql_function(:expiration_end, 'DD.MM.YYYY').as(:due_date),
           :content
         ]
 

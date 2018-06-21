@@ -5,6 +5,18 @@ module Cab
     # Пространство классов действий над записями индивидуальных
     # предпринимателей
     module Entrepreneurs
+      require_relative 'entrepreneurs/lookup'
+
+      # Возвращает ассоциативный массив с информацией об индивидуальных
+      # предпринимателях
+      # @param [Hash] params
+      #   ассоциативный массив параметров действия
+      # @return [Hash]
+      #   результирующий ассоциативный массив
+      def self.lookup(params)
+        Lookup.new(params).lookup
+      end
+
       require_relative 'entrepreneurs/show'
 
       # Возвращает ассоциативный массив с информацией об индивидуальном
