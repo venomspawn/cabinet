@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json-schema'
+
 module Cab
   need 'helpers/log'
 
@@ -47,6 +49,7 @@ module Cab
         # Отображение классов ошибок в коды ошибок
         ERRORS_MAP = {
           ArgumentError                     => 422,
+          JSON::Schema::ValidationError     => 422,
           Oj::ParseError                    => 422,
           RuntimeError                      => 422,
           Sequel::DatabaseError             => 422,
@@ -90,7 +93,7 @@ module Cab
           controller.error 500 do
             log_500_error
             status 500
-            content = { error: error_class, message: error.message }
+            content = { error: error.class, message: error.message }
             body Oj.dump(content)
           end
         end

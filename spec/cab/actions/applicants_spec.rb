@@ -17,7 +17,7 @@ RSpec.describe Cab::Actions::Applicants do
     describe 'result' do
       subject { result }
 
-      context 'when looking for an individual' do
+      context 'when looking for individuals' do
         let(:params) { { individual: { first_name: first_name } } }
         let(:first_name) { create(:string) }
         let!(:exact) { create_list(:individual, 2, name: first_name) }
@@ -26,7 +26,7 @@ RSpec.describe Cab::Actions::Applicants do
         it { is_expected.to match_json_schema(schema) }
       end
 
-      context 'when looking for an entrepreneur' do
+      context 'when looking for entrepreneurs' do
         let(:params) { { entrepreneur: { first_name: first_name } } }
         let(:first_name) { create(:string) }
         let!(:exact) { create_entrepreneurs(2, name: first_name) }
@@ -35,7 +35,7 @@ RSpec.describe Cab::Actions::Applicants do
         it { is_expected.to match_json_schema(schema) }
       end
 
-      context 'when looking for an organization' do
+      context 'when looking for organizations' do
         let(:params) { { organization: { full_name: full_name } } }
         let(:full_name) { create(:string) }
         let!(:exact) { create_list(:organization, 2, full_name: full_name) }
