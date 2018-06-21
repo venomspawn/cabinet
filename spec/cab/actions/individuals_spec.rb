@@ -30,7 +30,7 @@ RSpec.describe Cab::Actions::Individuals do
           expect(ids(subject[:exact]) - exact.map(&:id)).to be_empty
         end
 
-        it "shouldn\'t have more elements than limited in the property" do
+        it 'shouldn\'t have more elements in the property than limited' do
           expect(result[:exact].size).to be <= limit
         end
 
@@ -59,9 +59,61 @@ RSpec.describe Cab::Actions::Individuals do
                 .to be_empty
             end
 
-            it "shouldn\'t have more elements than limited in the property" do
+            it 'shouldn\'t have more elements in the property than limited' do
               expect(result[:without_last_name].size).to be <= limit
             end
+          end
+        end
+      end
+
+      context 'when there aren\'t exact matches' do
+        let(:params) { { first_name: first_name } }
+        let(:first_name) { create(:string) }
+        let(:limit) { described_class::Lookup::LIMIT }
+        let!(:other) { create_list(:individual, 2) }
+
+        it { is_expected.to match_json_schema(schema) }
+
+        it 'should have `exact` property empty' do
+          expect(result[:exact]).to be_empty
+        end
+
+        context 'when `last_name` param is blank' do
+          it 'should have `without_last_name` property empty' do
+            expect(result[:without_last_name]).to be_empty
+          end
+        end
+
+        context 'when `last_name` param isn\'t blank' do
+          let(:params) { { first_name: first_name, last_name: last_name } }
+          let(:last_name) { create(:string) }
+
+          context 'when there are exact matches excluding surname' do
+            let!(:ones) { create_list(:individual, limit + 1, one_traits) }
+            let(:one_traits) { { name: first_name, surname: create(:string) } }
+
+            it 'should have the matched info in `without_last_info`' do
+              expect(ids(subject[:without_last_name]) - ones.map(&:id))
+                .to be_empty
+            end
+
+            it 'shouldn\'t have more elements in the property than limited' do
+              expect(result[:without_last_name].size).to be <= limit
+            end
+          end
+        end
+
+        context 'when there are fuzzy matches' do
+          let!(:fuzzy) { create_list(:individual, limit + 1, fuzzy_traits) }
+          let(:fuzzy_traits){ { name: fuzzy_first_name } }
+          let(:fuzzy_first_name) { "#{first_name}f" }
+
+          it 'should have the matched info in `fuzzy`' do
+            expect(ids(subject[:fuzzy]) - fuzzy.map(&:id)).to be_empty
+          end
+
+          it 'shouldn\'t have more elements in the property than limited' do
+            expect(result[:fuzzy].size).to be <= limit
           end
         end
       end
