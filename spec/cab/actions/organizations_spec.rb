@@ -20,8 +20,8 @@ RSpec.describe Cab::Actions::Organizations do
       context 'when there are exact matches' do
         let(:params) { { full_name: full_name } }
         let(:full_name) { create(:string) }
-        let(:limit) { described_class::Lookup::LIMIT }
-        let!(:exact) { create_list(:organization, limit + 1, full_name: full_name) }
+        let(:lim) { described_class::Lookup::LIMIT }
+        let!(:exact) { create_list(:organization, lim, full_name: full_name) }
         let!(:other) { create_list(:organization, 2) }
 
         it { is_expected.to match_json_schema(schema) }
@@ -31,7 +31,7 @@ RSpec.describe Cab::Actions::Organizations do
         end
 
         it 'shouldn\'t have more elements in the property than limited' do
-          expect(result[:exact].size).to be <= limit
+          expect(result[:exact].size).to be <= lim
         end
 
         it 'should have `fuzzy` property empty' do
@@ -49,10 +49,10 @@ RSpec.describe Cab::Actions::Organizations do
           let(:inn) { create(:string, length: 10) }
 
           context 'when there are exact matches excluding inn' do
-            let!(:ones) { create_list(:organization, limit + 1, one_traits) }
+            let!(:ones) { create_list(:organization, lim + 1, one_traits) }
             let(:one_traits) { { full_name: full_name, inn: one_inn } }
             let(:one_inn) { create(:string, length: 10) }
-            let!(:exact) { create_list(:organization, limit + 1, exact_traits) }
+            let!(:exact) { create_list(:organization, lim + 1, exact_traits) }
             let(:exact_traits) { { full_name: full_name, inn: inn } }
 
             it 'should have the matched info in `without_last_info`' do
@@ -61,7 +61,7 @@ RSpec.describe Cab::Actions::Organizations do
             end
 
             it 'shouldn\'t have more elements in the property than limited' do
-              expect(result[:without_inn].size).to be <= limit
+              expect(result[:without_inn].size).to be <= lim
             end
           end
         end
@@ -70,7 +70,7 @@ RSpec.describe Cab::Actions::Organizations do
       context 'when there aren\'t exact matches' do
         let(:params) { { full_name: full_name } }
         let(:full_name) { create(:string) }
-        let(:limit) { described_class::Lookup::LIMIT }
+        let(:lim) { described_class::Lookup::LIMIT }
         let!(:other) { create_list(:organization, 2) }
 
         it { is_expected.to match_json_schema(schema) }
@@ -90,7 +90,7 @@ RSpec.describe Cab::Actions::Organizations do
           let(:inn) { create(:string, length: 10) }
 
           context 'when there are exact matches excluding inn' do
-            let!(:ones) { create_list(:organization, limit + 1, one_traits) }
+            let!(:ones) { create_list(:organization, lim + 1, one_traits) }
             let(:one_traits) { { full_name: full_name, inn: one_inn } }
             let(:one_inn) { create(:string, length: 10) }
 
@@ -100,13 +100,13 @@ RSpec.describe Cab::Actions::Organizations do
             end
 
             it 'shouldn\'t have more elements in the property than limited' do
-              expect(result[:without_inn].size).to be <= limit
+              expect(result[:without_inn].size).to be <= lim
             end
           end
         end
 
         context 'when there are fuzzy matches' do
-          let!(:fuzzy) { create_list(:organization, limit + 1, fuzzy_traits) }
+          let!(:fuzzy) { create_list(:organization, lim + 1, fuzzy_traits) }
           let(:fuzzy_traits){ { full_name: fuzzy_full_name } }
           let(:fuzzy_full_name) { "#{full_name}f" }
 
@@ -115,9 +115,57 @@ RSpec.describe Cab::Actions::Organizations do
           end
 
           it 'shouldn\'t have more elements in the property than limited' do
-            expect(result[:fuzzy].size).to be <= limit
+            expect(result[:fuzzy].size).to be <= lim
           end
         end
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
       end
     end
   end

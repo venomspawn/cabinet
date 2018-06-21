@@ -118,6 +118,54 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         end
       end
     end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
   end
 
   describe '.show' do

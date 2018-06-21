@@ -6,7 +6,92 @@ RSpec.describe Cab::Actions::Applicants do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:show) }
+    it { is_expected.to respond_to(:lookup, :show) }
+  end
+
+  describe '.lookup' do
+    include described_class::Lookup::SpecHelper
+
+    subject(:result) { described_class.lookup(params) }
+
+    describe 'result' do
+      subject { result }
+
+      context 'when looking for an individual' do
+        let(:params) { { individual: { first_name: first_name } } }
+        let(:first_name) { create(:string) }
+        let!(:exact) { create_list(:individual, 2, name: first_name) }
+        let!(:other) { create_list(:individual, 2) }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+
+      context 'when looking for an entrepreneur' do
+        let(:params) { { entrepreneur: { first_name: first_name } } }
+        let(:first_name) { create(:string) }
+        let!(:exact) { create_entrepreneurs(2, name: first_name) }
+        let!(:other) { create_entrepreneurs(2) }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+
+      context 'when looking for an organization' do
+        let(:params) { { organization: { full_name: full_name } } }
+        let(:full_name) { create(:string) }
+        let!(:exact) { create_list(:organization, 2, full_name: full_name) }
+        let!(:other) { create_list(:organization, 2) }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
   end
 
   describe '.show' do

@@ -6,8 +6,9 @@ module Cab
       class Lookup
         # JSON-схема результата работы действия
         RESULT_SCHEMA = {
-          definitions: {
-            organizations: {
+          type: :object,
+          properties: {
+            exact: {
               type: :array,
               items: {
                 type: :object,
@@ -34,18 +35,62 @@ module Cab
                 ],
                 additionalProperties: false
               }
-            }
-          },
-          type: :object,
-          properties: {
-            exact: {
-              '$ref': '#/definitions/organizations'
             },
             without_inn: {
-              '$ref': '#/definitions/organizations'
+              type: :array,
+              items: {
+                type: :object,
+                properties: {
+                  client_type: {
+                    type: :string,
+                    enum: %w[organization]
+                  },
+                  id: {
+                    type: :string
+                  },
+                  full_name: {
+                    type: :string
+                  },
+                  inn: {
+                    type: :string
+                  }
+                },
+                required: %i[
+                  client_type
+                  id
+                  full_name
+                  inn
+                ],
+                additionalProperties: false
+              }
             },
             fuzzy: {
-              '$ref': '#/definitions/organizations'
+              type: :array,
+              items: {
+                type: :object,
+                properties: {
+                  client_type: {
+                    type: :string,
+                    enum: %w[organization]
+                  },
+                  id: {
+                    type: :string
+                  },
+                  full_name: {
+                    type: :string
+                  },
+                  inn: {
+                    type: :string
+                  }
+                },
+                required: %i[
+                  client_type
+                  id
+                  full_name
+                  inn
+                ],
+                additionalProperties: false
+              }
             }
           },
           required: %i[
