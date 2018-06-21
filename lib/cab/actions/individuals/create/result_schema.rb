@@ -2,15 +2,15 @@
 
 module Cab
   module Actions
-    module Entrepreneurs
-      class Show
+    module Individuals
+      class Create
         # JSON-схема результата работы действия
         RESULT_SCHEMA = {
           type: :object,
           properties: {
             client_type: {
               type: :string,
-              enum: %w[entrepreneur]
+              enum: %w[individual]
             },
             id: {
               type: :string
@@ -46,26 +46,8 @@ module Cab
             },
             registration_address: {
             },
-            actual_address: {
+            residential_address: {
               type: %i[string number object array boolean]
-            },
-            bank_details: {
-            },
-            entrepreneur: {
-              type: :object,
-              properties: {
-                commercial_name: {
-                  type: %i[null string]
-                },
-                ogrn: {
-                  type: :string
-                }
-              },
-              required: %i[
-                commercial_name
-                ogrn
-              ],
-              additionalProperties: false
             },
             identity_documents: {
               type: :array,
@@ -164,9 +146,7 @@ module Cab
             inn
             snils
             registration_address
-            actual_address
-            bank_details
-            entrepreneur
+            residential_address
           ],
           additionalProperties: false
         }.freeze
