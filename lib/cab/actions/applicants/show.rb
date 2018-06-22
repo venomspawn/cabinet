@@ -5,6 +5,7 @@ module Cab
 
   module Actions
     module Applicants
+      # Класс действий извлечения информации о заявителях
       class Show < Base::Action
         require_relative 'show/params_schema'
 

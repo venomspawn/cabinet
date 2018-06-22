@@ -8,11 +8,11 @@ module Cab
       module Applicants
         module Lookup
           # Вспомогательный модуль, предназначенный для подключения к тестам
-          # действия содержащего класса
+          # REST API метода, описанного в содержащем модуле
           module SpecHelper
-            # Возвращает JSON-схему результирующего действия
+            # Возвращает JSON-схему тела ответа
             # @return [Object]
-            #   JSON-схема результирующего действия
+            #   JSON-схема тела ответа
             def schema
               Actions::Applicants::Lookup::RESULT_SCHEMA
             end

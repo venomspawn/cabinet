@@ -24,7 +24,7 @@ module Cab
             # @return [Status]
             #   200
             controller.get '/version' do
-              status 200
+              status :ok
               body BODY
             end
           end

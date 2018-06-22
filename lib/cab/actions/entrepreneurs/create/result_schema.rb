@@ -3,7 +3,7 @@
 module Cab
   module Actions
     module Entrepreneurs
-      class Show
+      class Create
         # JSON-схема результата работы действия
         RESULT_SCHEMA = {
           type: :object,
@@ -167,6 +167,8 @@ module Cab
             actual_address
             bank_details
             entrepreneur
+            identity_documents
+            consent_to_processing
           ],
           additionalProperties: false
         }.freeze

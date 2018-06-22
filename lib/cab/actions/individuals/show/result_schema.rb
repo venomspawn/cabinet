@@ -99,7 +99,8 @@ module Cab
                         content
                       ],
                       additionalProperties: false
-                    }
+                    },
+                    minItems: 1
                   }
                 },
                 required: %i[
@@ -128,7 +129,8 @@ module Cab
                   content
                 ],
                 additionalProperties: false
-              }
+              },
+              minItems: 1
             }
           },
           required: %i[

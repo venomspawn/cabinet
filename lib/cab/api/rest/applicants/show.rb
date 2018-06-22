@@ -25,7 +25,7 @@ module Cab
             controller.get '/applicants/:id' do |id|
               extended = params[:extended]
               content = Actions::Applicants.show(id: id, extended: extended)
-              status 200
+              status :ok
               body Oj.dump(content)
             end
           end

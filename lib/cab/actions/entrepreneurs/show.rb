@@ -5,6 +5,7 @@ module Cab
 
   module Actions
     module Entrepreneurs
+      # Класс действий извлечения информации об индивидуальных предпринимателях
       class Show < Base::Action
         require_relative 'show/params_schema'
 
