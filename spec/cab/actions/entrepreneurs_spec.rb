@@ -95,6 +95,14 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         expect { subject }.to change { Cab::Models::Entrepreneur.count }.by(1)
       end
 
+      context 'when the record of individual isn\'t found' do
+        let(:traits) { [:with_individual_id, individual_id: create(:uuid)] }
+
+        it 'should raise Sequel::NoMatchingRow' do
+          expect { subject }.to raise_error(Sequel::NoMatchingRow)
+        end
+      end
+
       context 'when there is information about spokesman' do
         let(:traits) { %i[with_individual_id with_spokesman] }
 

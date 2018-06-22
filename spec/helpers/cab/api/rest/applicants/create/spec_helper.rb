@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Cab
-  need 'actions/applicants/show/result_schema'
+  need 'actions/applicants/create/result_schema'
 
   module API
     module REST
       module Applicants
-        module Show
+        module Create
           # Вспомогательный модуль, предназначенный для подключения к тестам
           # REST API метода, описанного в содержащем модуле
           module SpecHelper
@@ -14,7 +14,7 @@ module Cab
             # @return [Object]
             #   JSON-схема тела ответа
             def schema
-              Actions::Applicants::Show::RESULT_SCHEMA
+              Actions::Applicants::Create::RESULT_SCHEMA
             end
           end
         end
