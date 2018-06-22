@@ -5,6 +5,7 @@ module Cab
 
   module Actions
     module Individuals
+      # Класс действий поиска информации о физических лицах
       class Lookup < Base::Action
         require_relative 'lookup/params_schema'
 

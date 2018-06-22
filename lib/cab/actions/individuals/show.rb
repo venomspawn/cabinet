@@ -5,6 +5,7 @@ module Cab
 
   module Actions
     module Individuals
+      # Класс действий извлечения информации о физических лицах
       class Show < Base::Action
         require_relative 'show/params_schema'
 

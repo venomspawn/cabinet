@@ -47,6 +47,34 @@ RSpec.describe Cab::Actions::Individuals do
           .to change { Cab::Models::IndividualSpokesman.count }
           .by(1)
       end
+
+      context 'when the record of spokesman isn\'t found' do
+        let(:traits) { [:with_spokesman, spokesman: spokesman] }
+        let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
+
+        it 'should raise Sequel::NoMatchingRow' do
+          expect { subject }.to raise_error(Sequel::NoMatchingRow)
+        end
+
+        it 'shouldn\'t create records' do
+          expect { subject }
+            .to raise_error(Sequel::NoMatchingRow)
+            .and change { Cab::Models::Individual.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::NoMatchingRow)
+            .and change { Cab::Models::IdentityDocument.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::NoMatchingRow)
+            .and change { Cab::Models::VicariousAuthority.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::NoMatchingRow)
+            .and change { Cab::Models::IndividualSpokesman.count }
+            .by(0)
+        end
+      end
     end
 
     context 'when params is of String type' do

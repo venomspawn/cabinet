@@ -6,7 +6,184 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:lookup, :show) }
+    it { is_expected.to respond_to(:create, :lookup, :show) }
+  end
+
+  describe '.create' do
+    include described_class::Create::SpecHelper
+
+    subject(:result) { described_class.create(params) }
+
+    let(:params) { create('params/actions/entrepreneurs/create', *traits) }
+    let(:traits) { %i[with_individual] }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to match_json_schema(schema) }
+    end
+
+    context 'when information about individual is provided' do
+      it 'should create a record of the individual' do
+        expect { subject }.to change { Cab::Models::Individual.count }.by(1)
+      end
+
+      it 'should create a record of identity document of the individual' do
+        expect { subject }
+          .to change { Cab::Models::IdentityDocument.count }
+          .by(1)
+      end
+
+      it 'should create a record of the entrepreneur' do
+        expect { subject }.to change { Cab::Models::Entrepreneur.count }.by(1)
+      end
+
+      context 'when there is information about spokesman' do
+        let(:traits) { %i[with_individual with_spokesman] }
+
+        it 'should create a record of vicarious authority' do
+          expect { subject }
+            .to change { Cab::Models::VicariousAuthority.count }
+            .by(1)
+        end
+
+        it 'should create a record of link with spokesman' do
+          expect { subject }
+            .to change { Cab::Models::EntrepreneurSpokesman.count }
+            .by(1)
+        end
+
+        context 'when the record of spokesman isn\'t found' do
+          let(:traits) { [:with_individual, :with_spokesman, args] }
+          let(:args) { { spokesman: spokesman } }
+          let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
+
+          it 'should raise Sequel::NoMatchingRow' do
+            expect { subject }.to raise_error(Sequel::NoMatchingRow)
+          end
+
+          it 'shouldn\'t create records' do
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::Individual.count }
+              .by(0)
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::IdentityDocument.count }
+              .by(0)
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::Entrepreneur.count }
+              .by(0)
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::VicariousAuthority.count }
+              .by(0)
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::EntrepreneurSpokesman.count }
+              .by(0)
+          end
+        end
+      end
+    end
+
+    context 'when information about individual id is provided' do
+      let(:traits) { %i[with_individual_id] }
+
+      it 'should create a record of the entrepreneur' do
+        expect { subject }.to change { Cab::Models::Entrepreneur.count }.by(1)
+      end
+
+      context 'when there is information about spokesman' do
+        let(:traits) { %i[with_individual_id with_spokesman] }
+
+        it 'should create a record of vicarious authority' do
+          expect { subject }
+            .to change { Cab::Models::VicariousAuthority.count }
+            .by(1)
+        end
+
+        it 'should create a record of link with spokesman' do
+          expect { subject }
+            .to change { Cab::Models::EntrepreneurSpokesman.count }
+            .by(1)
+        end
+
+        context 'when the record of spokesman isn\'t found' do
+          let(:traits) { [:with_individual, :with_spokesman, args] }
+          let(:args) { { spokesman: spokesman } }
+          let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
+
+          it 'should raise Sequel::NoMatchingRow' do
+            expect { subject }.to raise_error(Sequel::NoMatchingRow)
+          end
+
+          it 'shouldn\'t create records' do
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::Entrepreneur.count }
+              .by(0)
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::VicariousAuthority.count }
+              .by(0)
+            expect { subject }
+              .to raise_error(Sequel::NoMatchingRow)
+              .and change { Cab::Models::EntrepreneurSpokesman.count }
+              .by(0)
+          end
+        end
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
   end
 
   describe '.lookup' do

@@ -8,7 +8,7 @@ stages:
 
 ##Формируем название образа контейнера
 variables:
-  IMAGE_NAME: repo.it2.vm/cab_mfc
+  IMAGE_NAME: repo.it2.vm/microservices/cab_mfc
   PG_VERSION: 9.6.9
 
 ##Сборка образа(commit)

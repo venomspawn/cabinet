@@ -7,6 +7,7 @@ module Cab
 
   module Actions
     module Individuals
+      # Класс действий создания записи физического лица
       class Create < Base::Action
         require_relative 'create/params_schema'
 

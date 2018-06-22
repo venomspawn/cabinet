@@ -5,10 +5,11 @@ module Cab
 
   module Actions
     module Organizations
+      # Класс действий извлечения информации о юридических лицах
       class Show < Base::Action
         require_relative 'show/params_schema'
 
-        # Возвращает ассоциативный массив с информацией о физическом лице
+        # Возвращает ассоциативный массив с информацией о юридическом лице
         # @return [Hash]
         #   результирующий ассоциативный массив
         def show
@@ -37,7 +38,7 @@ module Cab
           .sql_function(:registration_date, 'DD.MM.YYYY')
           .as(:registration_date)
 
-        # Названия полей записи физического лица, извлекаемых из базы данных
+        # Названия полей записи юридического лица, извлекаемых из базы данных
         FIELDS = [
           :id,
           :full_name,
@@ -54,11 +55,11 @@ module Cab
           :bank_details.cast(:text)
         ].freeze
 
-        # Возвращает ассоциативный массив полей записи физического лица
+        # Возвращает ассоциативный массив полей записи юридического лица
         # @return [Hash]
         #   результирующий ассоциативный массив
         # @raise [Sequel::NoMatchingRow]
-        #   если запись физического лица не найдена
+        #   если запись юридического лица не найдена
         def values
           Models::Organization.naked.select(*FIELDS).where(id: id).first!
         end
