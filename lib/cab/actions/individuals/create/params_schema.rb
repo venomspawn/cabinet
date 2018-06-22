@@ -2,7 +2,7 @@
 
 module Cab
   module Actions
-    module Organizations
+    module Individuals
       class Create
         # JSON-схема параметров действия
         PARAMS_SCHEMA = {
@@ -122,7 +122,7 @@ module Cab
               }
             },
             identity_document: {
-              type: object,
+              type: :object,
               properties: {
                 type: {
                   type: :string,
@@ -159,7 +159,7 @@ module Cab
                 files: {
                   type: :array,
                   items: {
-                    type: object,
+                    type: :object,
                     properties: {
                       content: {
                         type: :string
@@ -183,7 +183,7 @@ module Cab
             consent_to_processing: {
               type: :array,
               items: {
-                type: object,
+                type: :object,
                 properties: {
                   content: {
                     type: :string
@@ -202,7 +202,7 @@ module Cab
                   type: :string
                 },
                 power_of_attorney: {
-                  type: object,
+                  type: :object,
                   properties: {
                     title: {
                       type: :string
@@ -261,7 +261,7 @@ module Cab
             birth_date
             sex
             citizenship
-            residence_address
+            residential_address
             identity_document
             consent_to_processing
           ]

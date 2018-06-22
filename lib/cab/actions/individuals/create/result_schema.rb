@@ -147,6 +147,8 @@ module Cab
             snils
             registration_address
             residential_address
+            identity_documents
+            consent_to_processing
           ],
           additionalProperties: false
         }.freeze

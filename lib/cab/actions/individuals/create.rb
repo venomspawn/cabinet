@@ -16,7 +16,7 @@ module Cab
         #   результирующий ассоциативный массив
         def create
           load_spokesman
-          Models::Individual.transaction(savepoint: true) do
+          Sequel::Model.db.transaction(savepoint: true) do
             record = create_individual
             create_identity_document(record)
             vicarious_authority = create_vicarious_authority
@@ -132,6 +132,11 @@ module Cab
           end
         end
 
+        # Список названий полей записи документа, подтверждающего полномочия
+        # представителя, значения которых извлекаются из параметров действия
+        VICARIOUS_AUTHORITY_FIELDS =
+          %i[number series registry_number issued_by issue_date].freeze
+
         # Возвращает ассоциативный массив полей записи документа,
         # подтверждающего полномочия представителя
         # @return [Hash]
@@ -139,10 +144,11 @@ module Cab
         def vicarious_authority_params
           param = params[:spokesman][:power_of_attorney]
           param.slice(*VICARIOUS_AUTHORITY_FIELDS).tap do |hash|
-            hash[:id]             = SecureRandom.uuid
-            hash[:expiration_end] = param[:due_date]
-            hash[:content]        = param[:files].first[:content]
-            hash[:created_at]     = Time.now
+            hash[:id]              = SecureRandom.uuid
+            hash[:name]            = param[:title]
+            hash[:expiration_date] = param[:due_date]
+            hash[:content]         = param[:files].first[:content]
+            hash[:created_at]      = Time.now
           end
         end
 
@@ -179,6 +185,36 @@ module Cab
             individual_id:          record.id,
             vicarious_authority_id: vicarious_authority.id
           }
+        end
+
+        # Названия полей ассоциативного массива атрибутов записи физического
+        # лица, копируемых из параметров действия
+        VALUES_FIELDS = %i[
+          first_name
+          last_name
+          birth_place
+          birth_date
+          sex
+          citizenship
+          residential_address
+          consent_to_processing
+        ]
+
+        # Возвращает ассоциативный массив атрибутов записи физического лица
+        # @param [Cab::Models::Individual] record
+        #   запись физического лица
+        # @return [Hash]
+        #   результирующий ассоциативный массив
+        def values(record)
+          params.slice(*VALUES_FIELDS).tap do |hash|
+            hash[:client_type]          = 'individual'
+            hash[:id]                   = record.id
+            hash[:middle_name]          = params[:middle_name]
+            hash[:inn]                  = params[:inn]
+            hash[:snils]                = params[:snils]
+            hash[:registration_address] = params[:registration_address]
+            hash[:identity_documents]   = [params[:identity_document]]
+          end
         end
       end
     end
