@@ -6,7 +6,118 @@ RSpec.describe Cab::Actions::Applicants do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:lookup, :show) }
+    it { is_expected.to respond_to(:create, :lookup, :show) }
+  end
+
+  describe '.create' do
+    include described_class::Create::SpecHelper
+
+    subject(:result) { described_class.create(params) }
+
+    describe 'result' do
+      subject { result }
+
+      context 'when creating a record of individual' do
+        let(:params) { { individual: data } }
+        let(:data) { create('params/actions/individuals/create') }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+
+      context 'when creating a record of entrepreneur' do
+        let(:params) { { entrepreneur: data } }
+        let(:data) { create('params/actions/entrepreneurs/create', *traits) }
+        let(:traits) { %i[with_individual] }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+
+      context 'when creating a record of organization' do
+        let(:params) { { organization: data } }
+        let(:data) { create('params/actions/organizations/create') }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+    end
+
+    context 'when creating a record of individual' do
+      let(:params) { { individual: data } }
+      let(:data) { create('params/actions/individuals/create') }
+
+      it 'should call `create` function of Cab::Actions::Individuals' do
+        expect(Cab::Actions::Individuals).to receive(:create)
+        subject
+      end
+    end
+
+    context 'when creating a record of entrepreneur' do
+      let(:params) { { entrepreneur: data } }
+      let(:data) { create('params/actions/entrepreneurs/create', *traits) }
+      let(:traits) { %i[with_individual] }
+
+      it 'should call `create` function of Cab::Actions::Entrepreneurs' do
+        expect(Cab::Actions::Entrepreneurs).to receive(:create)
+        subject
+      end
+    end
+
+    context 'when creating a record of organization' do
+      let(:params) { { organization: data } }
+      let(:data) { create('params/actions/organizations/create') }
+
+      it 'should call `create` function of Cab::Actions::Organizations' do
+        expect(Cab::Actions::Organizations).to receive(:create)
+        subject
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
   end
 
   describe '.lookup' do
@@ -42,6 +153,42 @@ RSpec.describe Cab::Actions::Applicants do
         let!(:other) { create_list(:organization, 2) }
 
         it { is_expected.to match_json_schema(schema) }
+      end
+    end
+
+    context 'when looking for individuals' do
+      let(:params) { { individual: { first_name: first_name } } }
+      let(:first_name) { create(:string) }
+      let!(:exact) { create_list(:individual, 2, name: first_name) }
+      let!(:other) { create_list(:individual, 2) }
+
+      it 'should call `lookup` function of Cab::Actions::Individuals' do
+        expect(Cab::Actions::Individuals).to receive(:lookup)
+        subject
+      end
+    end
+
+    context 'when looking for entrepreneurs' do
+      let(:params) { { entrepreneur: { first_name: first_name } } }
+      let(:first_name) { create(:string) }
+      let!(:exact) { create_entrepreneurs(2, name: first_name) }
+      let!(:other) { create_entrepreneurs(2) }
+
+      it 'should call `lookup` function of Cab::Actions::Entrepreneurs' do
+        expect(Cab::Actions::Entrepreneurs).to receive(:lookup)
+        subject
+      end
+    end
+
+    context 'when looking for organizations' do
+      let(:params) { { organization: { full_name: full_name } } }
+      let(:full_name) { create(:string) }
+      let!(:exact) { create_list(:organization, 2, full_name: full_name) }
+      let!(:other) { create_list(:organization, 2) }
+
+      it 'should call `lookup` function of Cab::Actions::Organizations' do
+        expect(Cab::Actions::Organizations).to receive(:lookup)
+        subject
       end
     end
 

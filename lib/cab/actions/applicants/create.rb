@@ -5,15 +5,16 @@ module Cab
 
   module Actions
     module Applicants
-      # Класс действий поиска информации о заявителях
-      class Lookup < Base::Action
-        require_relative 'lookup/params_schema'
+      # Класс действий создания записей заявителей
+      class Create < Base::Action
+        require_relative 'create/params_schema'
 
-        # Возвращает ассоциативный массив с информацией о заявителях
+        # Создаёт запись заявителя и возвращает ассоциативный массив с
+        # информацией о созданной записи
         # @return [Hash]
         #   результирующий ассоциативный массив
-        def lookup
-          lookup_module.lookup(lookup_params)
+        def create
+          creation_module.create(creation_params)
         end
 
         private
@@ -28,13 +29,13 @@ module Cab
         # Возвращает значение первого параметра
         # @return [Hash]
         #   значение первого параметра
-        def lookup_params
+        def creation_params
           params.first.last
         end
 
-        # Возвращает модуль, функции `lookup` которого делегируется поиск
+        # Возвращает модуль, функции `create` которого делегируется поиск
         # заявителя
-        def lookup_module
+        def creation_module
           return Individuals if type == :individual
           return Entrepreneurs if type == :entrepreneur
           Organizations
