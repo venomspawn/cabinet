@@ -6,7 +6,7 @@ RSpec.describe Cab::Actions::Organizations do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create, :lookup, :show) }
+    it { is_expected.to respond_to(:create, :lookup, :show, :update) }
   end
 
   describe '.create' do
@@ -338,6 +338,109 @@ RSpec.describe Cab::Actions::Organizations do
 
     context 'when the record can\'t be found' do
       let(:params) { { id: create(:uuid) } }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+    end
+  end
+
+  describe '.update' do
+    include described_class::Update::SpecHelper
+
+    subject(:result) { described_class.update(id, params) }
+
+    let(:id) { organization.id }
+    let(:organization) { create(:organization) }
+    let(:params) { create('params/actions/organizations/update') }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to match_json_schema(schema) }
+    end
+
+    it 'shouldn\'t update `created_at` field' do
+      expect { subject }.not_to change { organization.reload.created_at }
+    end
+
+    it 'should update fields of the record' do
+      subject
+      organization.reload
+
+      expect(organization.full_name).to be == params[:full_name]
+      expect(organization.short_name).to be == params[:sokr_name]
+      expect(organization.chief_name).to be == params[:chief_name]
+      expect(organization.chief_surname).to be == params[:chief_surname]
+
+      expect(organization.chief_middle_name)
+        .to be == params[:chief_middle_name]
+
+      expect(organization.registration_date)
+        .to be == Date.parse(params[:registration_date])
+
+      expect(organization.inn).to be == params[:inn]
+      expect(organization.kpp).to be == params[:kpp]
+      expect(organization.ogrn).to be == params[:ogrn]
+
+      expect(organization.legal_address.to_hash.symbolize_keys)
+        .to be == params[:legal_address]
+
+      expect(organization.actual_address.to_hash.symbolize_keys)
+        .to be == params[:actual_address]
+
+      expect(organization.bank_details.to_hash.symbolize_keys)
+        .to be == params[:bank_details]
+    end
+
+    context 'when there is `id` property in params' do
+      let(:params) { create('params/actions/organizations/update', traits) }
+      let(:traits) { { id: new_id } }
+      let(:new_id) { create(:uuid) }
+
+      it 'should ignore it' do
+        expect { subject }.not_to change { organization.reload.id }
+      end
+    end
+
+    context 'when there is additional property in params' do
+      let(:params) { { additional: :property } }
+
+      it 'should ignore it' do
+        expect { subject }.not_to change { organization.reload.values }
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
+
+    context 'when the record can\'t be found' do
+      let(:id) { create(:uuid) }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)

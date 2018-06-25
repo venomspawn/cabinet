@@ -8,8 +8,8 @@ module Cab
 
       # Создаёт запись юридического лица и возвращает ассоциативный массив с
       # информацией о созданной записи
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
       # @return [Hash]
       #   результирующий ассоциативный массив
       def self.create(params)
@@ -19,8 +19,8 @@ module Cab
       require_relative 'organizations/lookup'
 
       # Возвращает ассоциативный массив с информацией о юридических лицах
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
       # @return [Hash]
       #   результирующий ассоциативный массив
       def self.lookup(params)
@@ -30,12 +30,26 @@ module Cab
       require_relative 'organizations/show'
 
       # Возвращает ассоциативный массив с информацией о юридическом лице
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
       # @return [Hash]
       #   результирующий ассоциативный массив
       def self.show(params)
         Show.new(params).show
+      end
+
+      require_relative 'organizations/update'
+
+      # Обновляет поля записи юридического лица и возвращает ассоциативный
+      # массив с информацией об обновлённой записи
+      # @param [String] id
+      #   идентификатор записи
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @return [Hash]
+      #   результирующий ассоциативный массив
+      def self.update(id, params)
+        Update.new(id, params).update
       end
     end
   end
