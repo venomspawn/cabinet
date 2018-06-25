@@ -33,8 +33,8 @@ module Cab
           params.first.last
         end
 
-        # Возвращает модуль, функции `create` которого делегируется поиск
-        # заявителя
+        # Возвращает модуль, функции `create` которого делегируется создание
+        # записи заявителя
         def creation_module
           return Individuals if type == :individual
           return Entrepreneurs if type == :entrepreneur

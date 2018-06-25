@@ -33,7 +33,7 @@ module Cab
         end
 
         # Возвращает модуль, функции `lookup` которого делегируется поиск
-        # заявителя
+        # информации о заявителях
         def lookup_module
           return Individuals if type == :individual
           return Entrepreneurs if type == :entrepreneur
