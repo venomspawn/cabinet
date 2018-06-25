@@ -10,7 +10,7 @@ FactoryBot.define do
     chief_name        { create(:string) }
     chief_surname     { create(:string) }
     chief_middle_name { create(:string) }
-    registration_date { create(:date).to_s }
+    registration_date { create(:date).strftime('%d.%m.%Y') }
     inn               { create(:string, length: 10) }
     kpp               { create(:string, length: 9) }
     ogrn              { create(:string, length: 13) }

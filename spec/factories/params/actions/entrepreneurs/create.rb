@@ -14,7 +14,7 @@ FactoryBot.define do
       last_name             { create(:string) }
       middle_name           { create(:string) }
       birth_place           { create(:string) }
-      birth_date            { create(:date).to_s }
+      birth_date            { create(:date).strftime('%d.%m.%Y') }
       sex                   { create(:enum, values: %w[male female]) }
       citizenship           { create(:enum, values: %w[russian foreign]) }
       snils                 { create(:snils) }
