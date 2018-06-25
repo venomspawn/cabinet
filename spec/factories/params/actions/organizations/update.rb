@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-# Фабрика ассоциативных массивов с параметрами действия создания записи
+# Фабрика ассоциативных массивов с параметрами действия обновления полей записи
 # юридического лица
 
 FactoryBot.define do
-  factory 'params/actions/organizations/create', class: Hash do
+  factory 'params/actions/organizations/update', class: Hash do
     full_name         { create(:string) }
     sokr_name         { create(:string) }
     chief_name        { create(:string) }
@@ -17,7 +17,6 @@ FactoryBot.define do
     legal_address     { create(:address) }
     actual_address    { create(:address) }
     bank_details      { create(:bank_details) }
-    spokesman         { create('params/spokesman') }
 
     skip_create
     initialize_with { attributes }

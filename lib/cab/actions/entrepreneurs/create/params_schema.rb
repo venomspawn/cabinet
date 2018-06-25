@@ -23,7 +23,8 @@ module Cab
                   type: :string
                 },
                 birth_date: {
-                  type: :string
+                  type: :string,
+                  pattern: /^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}$/
                 },
                 sex: {
                   type: :string,

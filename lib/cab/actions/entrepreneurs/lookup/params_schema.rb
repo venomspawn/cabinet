@@ -19,7 +19,7 @@ module Cab
             },
             birth_date: {
               type: :string,
-              pattern: /[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}/
+              pattern: /^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}$/
             },
             birth_place: {
               type: :string

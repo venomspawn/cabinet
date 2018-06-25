@@ -78,6 +78,11 @@ RSpec.describe Cab::API::REST::Applicants::Create do
 
       it { is_expected.to have_proper_body(schema) }
 
+      it 'should call `create` function of Cab::Actions::Organizations' do
+        expect(Cab::Actions::Organizations).to receive(:create)
+        subject
+      end
+
       context 'when the record of spokesman isn\'t found' do
         let(:traits) { { spokesman: spokesman } }
         let(:spokesman) { create('params/spokesman', id: create(:uuid)) }

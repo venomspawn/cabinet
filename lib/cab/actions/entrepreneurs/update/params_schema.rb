@@ -1,42 +1,22 @@
-# frozen_:string_literal: true
+# frozen_string_literal: true
 
 module Cab
   module Actions
-    module Organizations
-      class Create
+    module Entrepreneurs
+      class Update
         # JSON-схема параметров действия
         PARAMS_SCHEMA = {
           type: :object,
           properties: {
-            full_name: {
-              type: :string
-            },
-            sokr_name: {
-              type: %i[string null]
-            },
-            chief_name: {
-              type: :string
-            },
-            chief_surname: {
-              type: :string
-            },
-            chief_middle_name: {
-              type: %i[string null]
-            },
-            registration_date: {
-              type: :string,
-              pattern: /^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}$/
+            snils: {
+              type: %i[string null],
+              pattern: /^[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}$/
             },
             inn: {
-              type: :string
+              type: %i[string null],
+              pattern: /^[0-9]{12}$/
             },
-            kpp: {
-              type: :string
-            },
-            ogrn: {
-              type: :string
-            },
-            legal_address: {
+            registration_address: {
               type: :object,
               properties: {
                 zip: {
@@ -78,7 +58,7 @@ module Cab
               }
             },
             actual_address: {
-              type: %i[object null],
+              type: :object,
               properties: {
                 zip: {
                   type: %i[string null]
@@ -135,76 +115,21 @@ module Cab
                 }
               }
             },
-            spokesman: {
-              type: %i[object null],
+            entrepreneur: {
+              type: :object,
               properties: {
-                id: {
-                  type: :string
+                commercial_name: {
+                  type: %i[string null]
                 },
-                power_of_attorney: {
-                  type: :object,
-                  properties: {
-                    title: {
-                      type: :string
-                    },
-                    number: {
-                      type: %i[string null]
-                    },
-                    series: {
-                      type: %i[string null]
-                    },
-                    registry_number: {
-                      type: %i[string null]
-                    },
-                    issued_by: {
-                      type: :string
-                    },
-                    issue_date: {
-                      type: :string
-                    },
-                    due_date: {
-                      type: %i[string null]
-                    },
-                    files: {
-                      type: :array,
-                      items: {
-                        type: :object,
-                        properties: {
-                          content: {
-                            type: :string
-                          }
-                        },
-                        required: %i[
-                          content
-                        ]
-                      },
-                      minItems: 1
-                    }
-                  },
-                  required: %i[
-                    title
-                    issued_by
-                    issue_date
-                  ]
+                ogrn: {
+                  type: :string
                 }
               },
               required: %i[
-                id
-                power_of_attorney
+                ogrn
               ]
             }
-          },
-          required: %i[
-            full_name
-            chief_name
-            chief_surname
-            registration_date
-            inn
-            kpp
-            ogrn
-            legal_address
-            spokesman
-          ]
+          }
         }.freeze
       end
     end

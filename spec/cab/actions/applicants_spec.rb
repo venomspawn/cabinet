@@ -6,7 +6,7 @@ RSpec.describe Cab::Actions::Applicants do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create, :lookup, :show) }
+    it { is_expected.to respond_to(:create, :lookup, :show, :update) }
   end
 
   describe '.create' do
@@ -411,6 +411,148 @@ RSpec.describe Cab::Actions::Applicants do
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+    end
+  end
+
+  describe '.update' do
+    include described_class::Update::SpecHelper
+
+    subject(:result) { described_class.update(id, params) }
+
+    let(:id) { record.id }
+    let(:record) { create(:individual) }
+
+    describe 'result' do
+      subject { result }
+
+      context 'when updating a record of individual' do
+        let(:record) { create(:individual) }
+        let(:params) { { individual: data } }
+        let(:data) { create('params/actions/individuals/update') }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+
+      context 'when updating a record of entrepreneur' do
+        let(:record) { create(:entrepreneur) }
+        let(:params) { { entrepreneur: data } }
+        let(:data) { create('params/actions/entrepreneurs/update') }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+
+      context 'when updating a record of organization' do
+        let(:record) { create(:organization) }
+        let(:params) { { organization: data } }
+        let(:data) { create('params/actions/organizations/update') }
+
+        it { is_expected.to match_json_schema(schema) }
+      end
+    end
+
+    context 'when updating a record of individual' do
+      let(:record) { create(:individual) }
+      let(:params) { { individual: data } }
+      let(:data) { create('params/actions/individuals/update') }
+
+      it 'should call `update` function of Cab::Actions::Individuals' do
+        expect(Cab::Actions::Individuals).to receive(:update)
+        subject
+      end
+
+      context 'when the record isn\'t found' do
+        let(:id) { create(:uuid) }
+
+        it 'should raise Sequel::NoMatchingRow' do
+          expect { subject }.to raise_error(Sequel::NoMatchingRow)
+        end
+      end
+    end
+
+    context 'when updating a record of entrepreneur' do
+      let(:record) { create(:entrepreneur) }
+      let(:params) { { entrepreneur: data } }
+      let(:data) { create('params/actions/entrepreneurs/update') }
+
+      it 'should call `update` function of Cab::Actions::Entrepreneurs' do
+        expect(Cab::Actions::Entrepreneurs).to receive(:update)
+        subject
+      end
+
+      context 'when the record isn\'t found' do
+        let(:id) { create(:uuid) }
+
+        it 'should raise Sequel::NoMatchingRow' do
+          expect { subject }.to raise_error(Sequel::NoMatchingRow)
+        end
+      end
+    end
+
+    context 'when updating a record of organization' do
+      let(:record) { create(:organization) }
+      let(:params) { { organization: data } }
+      let(:data) { create('params/actions/organizations/update') }
+
+      it 'should call `update` function of Cab::Actions::Organizations' do
+        expect(Cab::Actions::Organizations).to receive(:update)
+        subject
+      end
+
+      context 'when the record isn\'t found' do
+        let(:id) { create(:uuid) }
+
+        it 'should raise Sequel::NoMatchingRow' do
+          expect { subject }.to raise_error(Sequel::NoMatchingRow)
+        end
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
       end
     end
   end
