@@ -51,6 +51,20 @@ module Cab
       def self.update(id, params)
         Update.new(id, params).update
       end
+
+      require_relative 'individuals/update_personal_info'
+
+      # Обновляет персональные данные у записи физического лица и возвращает
+      # ассоциативный массив с информацией об обновлённой записи
+      # @param [String] id
+      #   идентификатор записи
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @return [Hash]
+      #   результирующий ассоциативный массив
+      def self.update_personal_info(id, params)
+        UpdatePersonalInfo.new(id, params).update
+      end
     end
   end
 end
