@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Cab
-  need 'actions/organizations/update_personal_info/result_schema'
+  need 'actions/documents/update/result_schema'
 
   module API
     module REST
-      module Organizations
-        module UpdatePersonalInfo
+      module Documents
+        module Update
           # Вспомогательный модуль, предназначенный для подключения к тестам
           # REST API метода, описанного в содержащем модуле
           module SpecHelper
@@ -14,7 +14,7 @@ module Cab
             # @return [Object]
             #   JSON-схема тела ответа
             def schema
-              Actions::Organizations::UpdatePersonalInfo::RESULT_SCHEMA
+              Actions::Documents::Update::RESULT_SCHEMA
             end
           end
         end
