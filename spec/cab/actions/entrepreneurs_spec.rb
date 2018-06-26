@@ -6,7 +6,8 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create, :lookup, :show, :update) }
+    names = %i[create lookup show update update_personal_info]
+    it { is_expected.to respond_to(*names) }
   end
 
   describe '.create' do
@@ -529,6 +530,106 @@ RSpec.describe Cab::Actions::Entrepreneurs do
 
       it 'should ignore it' do
         expect { subject }.not_to change { entrepreneur.reload.values }
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
+
+    context 'when the record can\'t be found' do
+      let(:id) { create(:uuid) }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+    end
+  end
+
+  describe '.update_personal_info' do
+    include described_class::UpdatePersonalInfo::SpecHelper
+
+    subject(:result) { described_class.update_personal_info(id, params) }
+
+    let(:id) { entrepreneur.id }
+    let(:entrepreneur) { create(:entrepreneur) }
+    let(:individual) { Cab::Models::Individual.with_pk!(individual_id) }
+    let(:individual_id) { entrepreneur.individual_id }
+    let(:factory) { 'params/actions/entrepreneurs/update_personal_info' }
+    let(:params) { create(factory) }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to match_json_schema(schema) }
+    end
+
+    it 'shouldn\'t update `created_at` field' do
+      expect { subject }.not_to change { entrepreneur.reload.created_at }
+      expect { subject }.not_to change { individual.reload.created_at }
+    end
+
+    it 'should update fields of the record' do
+      subject
+      individual.reload
+
+      expect(individual.name).to be == params[:first_name]
+      expect(individual.surname).to be == params[:last_name]
+      expect(individual.middle_name).to be == params[:middle_name]
+      expect(individual.birth_place).to be == params[:birth_place]
+      expect(individual.birthday).to be == Date.parse(params[:birth_date])
+      expect(individual.sex).to be == params[:sex]
+      expect(individual.citizenship).to be == params[:citizenship]
+    end
+
+    it 'should create a record of identity document of the individual' do
+      expect { subject }
+        .to change { Cab::Models::IdentityDocument.count }
+        .by(1)
+    end
+
+    context 'when there is `id` property in params' do
+      let(:params) { create(factory, traits) }
+      let(:traits) { { id: new_id } }
+      let(:new_id) { create(:uuid) }
+
+      it 'should ignore it' do
+        expect { subject }.not_to change { entrepreneur.reload.id }
+        expect { subject }.not_to change { individual.reload.id }
+      end
+    end
+
+    context 'when there is additional property in params' do
+      let(:params) { { identity_document: identity_document, some: :value } }
+      let(:identity_document) { create('params/identity_document') }
+
+      it 'should ignore it' do
+        expect { subject }.not_to change { entrepreneur.reload.values }
+        expect { subject }.not_to change { individual.reload.values }
       end
     end
 
