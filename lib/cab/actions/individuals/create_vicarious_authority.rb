@@ -76,8 +76,6 @@ module Cab
 
         # Создаёт запись связи между записями физического лица и его
         # представителя
-        # @param [Cab::Models::Individual] record
-        #   запись физического лица
         # @param [Models::VicariousAuthority] vicarious_authority
         #   запись документа, подтверждающего полномочия представителя
         def create_individual_spokesman(vicarious_authority)
