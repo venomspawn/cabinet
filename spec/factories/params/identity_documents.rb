@@ -11,7 +11,7 @@ FactoryBot.define do
     issued_by  { create(:string) }
     issue_date { create(:date).to_s }
     due_date   { create(:date).to_s }
-    files      { [content: create(:string)] }
+    content    { create(:string) }
 
     skip_create
     initialize_with { attributes }

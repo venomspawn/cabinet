@@ -110,7 +110,7 @@ module Cab
         # @return [Array<(Boolean, Object)>]
         #   результирующий список
         def extract_path_value(path)
-          value = source.inject(params) do |memo, key|
+          value = path.inject(params) do |memo, key|
             memo.key?(key) ? memo[key] : (return [false, nil])
           end
           [true, value]
