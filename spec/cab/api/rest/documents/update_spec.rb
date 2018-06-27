@@ -5,8 +5,6 @@
 
 RSpec.describe Cab::API::REST::Documents::Update do
   describe 'PUT /documents/:id' do
-    include described_class::SpecHelper
-
     subject { put "/documents/#{id}", request_body }
 
     let(:request_body) { Oj.dump(params) }
@@ -14,9 +12,7 @@ RSpec.describe Cab::API::REST::Documents::Update do
     let(:record) { create(:identity_document) }
     let(:params) { create('params/actions/documents/update') }
 
-    it { is_expected.to be_ok }
-
-    it { is_expected.to have_proper_body(schema) }
+    it { is_expected.to be_no_content }
 
     it 'should call `update` function of Cab::Actions::Documents' do
       expect(Cab::Actions::Documents).to receive(:update)
@@ -30,16 +26,16 @@ RSpec.describe Cab::API::REST::Documents::Update do
     end
 
     context 'when request body is a JSON-string' do
-      context 'when params represents a list ' do
-        context 'when the list is of wrong structure' do
-          let(:request_body) { Oj.dump(%i[wrong structure]) }
+      context 'when params represents a map' do
+        context 'when the map is of wrong structure' do
+          let(:request_body) { Oj.dump(wrong: :structure) }
 
           it { is_expected.to be_unprocessable }
         end
       end
 
-      context 'when params does not represent a list ' do
-        let(:request_body) { Oj.dump(not: { a: :list }) }
+      context 'when params does not represent a map' do
+        let(:request_body) { Oj.dump(%i[not a map]) }
 
         it { is_expected.to be_unprocessable }
       end

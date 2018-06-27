@@ -13,20 +13,15 @@ module Cab
           # @param [Cab::API::REST::Controller] controller
           #   контроллер
           def self.registered(controller)
-            # Обновляет содержимое файла документа, удостоверяющего личность,
-            # и возвращает информацию об обновлённом содержимом
+            # Обновляет содержимое файла документа, удостоверяющего личность
             # @param [Hash] params
             #   ассоциативный массив, структура которого описана JSON-схемой
             #   {Actions::Documents::Update::PARAMS_SCHEMA}
-            # @return [Hash]
-            #   ассоциативный массив, структура которого описана JSON-схемой
-            #   {Actions::Documents::Update::RESULT_SCHEMA}
             # @return [Status]
-            #   200
+            #   204
             controller.put '/documents/:id' do |id|
-              content = Actions::Documents.update(id, request_body)
-              status :ok
-              body Oj.dump(content)
+              Actions::Documents.update(id, request_body)
+              status :no_content
             end
           end
         end

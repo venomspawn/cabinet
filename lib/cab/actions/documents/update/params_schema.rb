@@ -6,19 +6,15 @@ module Cab
       class Update
         # JSON-схема параметров действия
         PARAMS_SCHEMA = {
-          type: :array,
-          items: {
-            type: :object,
-            properties: {
-              content: {
-                type: :string
-              }
-            },
-            required: %i[
-              content
-            ]
+          type: :object,
+          property: {
+            content: {
+              type: :string
+            }
           },
-          minItems: 1
+          required: %i[
+            content
+          ]
         }.freeze
       end
     end

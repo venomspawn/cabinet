@@ -4,17 +4,14 @@
 # файла документа, удостоверяющего личность
 
 FactoryBot.define do
-  factory 'params/actions/documents/update', class: Array do
-    transient { content { create(:string) } }
-    transient { with_id { false } }
+  factory 'params/actions/documents/update', class: Hash do
+    content { create(:string) }
 
     trait :with_id do
-      transient { with_id { true } }
+      id { create(:uuid) }
     end
 
     skip_create
-    initialize_with do
-      with_id ? [content: content, id: create(:uuid)] : [content: content]
-    end
+    initialize_with { attributes }
   end
 end
