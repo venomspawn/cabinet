@@ -21,8 +21,7 @@ module Cab
             # @return [Status]
             #   204
             controller.post '/individuals/:id/vicarious_authority' do |id|
-              content = Actions::Individuals
-                        .create_vicarious_authority(id, request_body)
+              Actions::Individuals.create_vicarious_authority(id, request_body)
               status :no_content
             end
           end
