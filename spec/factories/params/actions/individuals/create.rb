@@ -17,7 +17,7 @@ FactoryBot.define do
     registration_address  { create(:address) }
     residential_address   { create(:address) }
     identity_document     { create('params/identity_document') }
-    consent_to_processing { [content: create(:string)] }
+    consent_to_processing { { content: create(:string) } }
 
     trait :with_spokesman do
       spokesman { create('params/spokesman') }
