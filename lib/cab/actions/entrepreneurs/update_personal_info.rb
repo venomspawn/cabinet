@@ -3,29 +3,14 @@
 require 'securerandom'
 
 module Cab
-  need 'actions/base/action'
+  need 'actions/base/record_action'
 
   module Actions
     module Entrepreneurs
       # Класс действий обновления персональных данных у записи индивидуального
       # предпринимателя
-      class UpdatePersonalInfo < Base::Action
+      class UpdatePersonalInfo < Base::RecordAction
         require_relative 'update_personal_info/params_schema'
-
-        # Инициализирует объект класса
-        # @param [String] id
-        #   идентификатор записи
-        # @param [Object] params
-        #   параметры действия
-        # @raise [Oj::ParseError]
-        #   если параметры действия являются строкой, но не являются
-        #   JSON-строкой
-        # @raise [JSON::Schema::ValidationError]
-        #   если аргумент не является объектом требуемых типа и структуры
-        def initialize(id, params)
-          super(params)
-          @id = id
-        end
 
         # Обновляет персональные данные у записи индивидуального
         # предпринимателя и возвращает ассоциативный массив с информацией об
@@ -35,17 +20,12 @@ module Cab
         def update
           Sequel::Model.db.transaction(savepoint: true) do
             individual.update(individual_params)
-            create_identity_document
+            document = create_identity_document
+            { identity_document_id: document.id }
           end
-          Entrepreneurs.show(id: id)
         end
 
         private
-
-        # Идентификатор записи
-        # @return [String] id
-        #   идентификатор записи
-        attr_reader :id
 
         # Возвращает запись индивидуального предпринимателя
         # @return [Cab::Models::Entrepreneur]
@@ -61,35 +41,19 @@ module Cab
         # @return [Cab::Models::Individual]
         #   запись физического лица
         def individual
-          @individual ||= Models::Individual.with_pk!(record.individual_id)
-        end
-
-        # Копирует значения из одного ассоциативного массива в другой согласно
-        # ключам предоставленной схемы и возвращает ассоциативный массив,
-        # в который скопированы значения
-        # @param [Hash] src
-        #   ассоциативный массив, из которого копируются значения
-        # @param [Hash] dst
-        #   ассоциативный массив, в который копируются значения
-        # @param [Hash] map
-        #   ассоциативный массив, являющийся схемой ключей и отображающий ключи
-        #   ассоциативного массива, из которого копируются значения, в ключи
-        #   ассоциативного массива, в который копируются значения
-        # @return [Hash]
-        #   ассоциативный массив, в который скопированы значения
-        def copy_existing(src, dst, map)
-          dst.tap { map.each { |s, d| dst[d] = src[s] if src.key?(s) } }
+          @individual ||=
+            Models::Individual.select(:id).with_pk!(record.individual_id)
         end
 
         # Ассоциативный массив, отображающий названия ключей ассоциативного
-        # массива параметров в названия ключей ассоциативного массива атрибутов
-        # записи физического лица
+        # массива атрибутов записи физического лица в названия ключей
+        # ассоциативного массива параметров
         INDIVIDUAL_FIELDS = {
-          first_name:  :name,
-          last_name:   :surname,
+          name:        :first_name,
+          surname:     :last_name,
           middle_name: :middle_name,
           birth_place: :birth_place,
-          birth_date:  :birthday,
+          birthday:    :birth_date,
           sex:         :sex,
           citizenship: :citizenship
         }.freeze
@@ -98,33 +62,37 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def individual_params
-          copy_existing(params, {}, INDIVIDUAL_FIELDS)
+          extract_params(INDIVIDUAL_FIELDS)
         end
 
         # Создаёт запись документа, удостоверяющего личность физического лица
         def create_identity_document
-          Models::IdentityDocument.unrestrict_primary_key
-          Models::IdentityDocument.create(identity_document_params)
-          Models::IdentityDocument.restrict_primary_key
+          create_unrestricted(:IdentityDocument, identity_document_params)
         end
 
-        # Список названий полей записи документа, удостоверяющего личность,
-        # значения которых извлекаются из параметров действия
-        IDENTITY_DOCUMENT_FIELDS =
-          %i[type number series issued_by issue_date].freeze
+        # Ассоциативный массив, в котором сопоставляются названия полей записи
+        # документа, удостоверяющего личность, и способы извлечения значений
+        # этих полей из параметров действия
+        IDENTITY_DOCUMENT_FIELDS = {
+          id:             SecureRandom.method(:uuid),
+          type:           %i[identity_document type],
+          name:           %i[identity_document title],
+          number:         %i[identity_document number],
+          series:         %i[identity_document series],
+          issued_by:      %i[identity_document issued_by],
+          issue_date:     %i[identity_document issue_date],
+          expiration_end: %i[identity_document due_date],
+          content:        %i[identity_document content],
+          created_at:     Time.method(:now)
+        }.freeze
 
         # Возвращает ассоциативный массив полей записи документа,
         # удостоверяющего личность
         # @return [Hash]
         #   результирующий ассоциативный массив
         def identity_document_params
-          param = params[:identity_document]
-          param.slice(*IDENTITY_DOCUMENT_FIELDS).tap do |hash|
-            hash[:id]             = SecureRandom.uuid
-            hash[:expiration_end] = param[:due_date]
-            hash[:content]        = param[:files].first[:content]
-            hash[:created_at]     = Time.now
-            hash[:individual_id]  = individual.id
+          extract_params(IDENTITY_DOCUMENT_FIELDS).tap do |hash|
+            hash[:individual_id] = individual.id
           end
         end
       end

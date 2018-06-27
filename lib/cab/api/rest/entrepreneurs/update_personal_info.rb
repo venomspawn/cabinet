@@ -12,7 +12,8 @@ module Cab
           #   контроллер
           def self.registered(controller)
             # Обновляет персональные данные в записи индивидуального
-            # предпринимателя и возвращает информацию об обновлённой записи
+            # предпринимателя и возвращает информацию о созданном документе,
+            # удостоверяющем личность
             # @param [Hash] params
             #   ассоциативный массив, структура которого описана JSON-схемой
             #   {Actions::Entrepreneurs::UpdatePersonalInfo::PARAMS_SCHEMA}
@@ -20,11 +21,11 @@ module Cab
             #   ассоциативный массив, структура которого описана JSON-схемой
             #   {Actions::Entrepreneurs::UpdatePersonalInfo::RESULT_SCHEMA}
             # @return [Status]
-            #   200
+            #   201
             controller.put '/entrepreneurs/:id/personal' do |id|
               content =
                 Actions::Entrepreneurs.update_personal_info(id, request_body)
-              status :ok
+              status :created
               body Oj.dump(content)
             end
           end
