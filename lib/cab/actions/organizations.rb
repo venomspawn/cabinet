@@ -16,6 +16,22 @@ module Cab
         Create.new(params).create
       end
 
+      require_relative 'organizations/create_vicarious_authority'
+
+      # Создаёт запись документа, подтверждающего полномочия представителя,
+      # создаёт запись связи между записями юридического лица, представителя и
+      # созданного документа, после чего возвращает ассоциативный массив с
+      # информацией о созданной записи связи
+      # @param [String] id
+      #   идентификатор записи юридического лица
+      # @param [Hash] params
+      #   ассоциативный массив параметров действия
+      # @return [Hash]
+      #   результирующий ассоциативный массив
+      def self.create_vicarious_authority(id, params)
+        CreateVicariousAuthority.new(id, params).create
+      end
+
       require_relative 'organizations/lookup'
 
       # Возвращает ассоциативный массив с информацией о юридических лицах

@@ -6,7 +6,8 @@ RSpec.describe Cab::Actions::Organizations do
   describe 'the module' do
     subject { described_class }
 
-    it { is_expected.to respond_to(:create, :lookup, :show, :update) }
+    names = %i[create create_vicarious_authority lookup show update]
+    it { is_expected.to respond_to(*names) }
   end
 
   describe '.create' do
@@ -52,6 +53,122 @@ RSpec.describe Cab::Actions::Organizations do
           .to raise_error(Sequel::NoMatchingRow)
           .and change { Cab::Models::Organization.count }
           .by(0)
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::OrganizationSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
+  end
+
+  describe '.create_vicarious_authority' do
+    include described_class::CreateVicariousAuthority::SpecHelper
+
+    subject(:result) { described_class.create_vicarious_authority(id, params) }
+
+    let(:id) { record.id }
+    let(:record) { create(:organization) }
+    let(:factory) { 'params/actions/organizations/create_vicarious_authority' }
+    let(:params) { create(factory, traits) }
+    let(:traits) { {} }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to match_json_schema(schema) }
+    end
+
+    it 'should create a record of vicarious authority' do
+      expect { subject }
+        .to change { Cab::Models::VicariousAuthority.count }
+        .by(1)
+    end
+
+    it 'should create a record of link between organization and spokesman' do
+      expect { subject }
+        .to change { Cab::Models::OrganizationSpokesman.count }
+        .by(1)
+    end
+
+    context 'when the record of organization isn\'t found' do
+      let(:id) { create(:uuid) }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::OrganizationSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when the record of spokesman isn\'t found' do
+      let(:traits) { { id: create(:uuid) } }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+
+      it 'shouldn\'t create records' do
         expect { subject }
           .to raise_error(Sequel::NoMatchingRow)
           .and change { Cab::Models::VicariousAuthority.count }

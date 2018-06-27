@@ -246,6 +246,7 @@ module Cab
                     title
                     issued_by
                     issue_date
+                    files
                   ]
                 }
               },
