@@ -56,14 +56,11 @@ module Cab
 
       require_relative 'entrepreneurs/update'
 
-      # Обновляет поля записи индивидуального предпринимателя и возвращает
-      # ассоциативный массив с информацией об обновлённой записи
+      # Обновляет поля записи индивидуального предпринимателя
       # @param [String] id
       #   идентификатор записи
       # @param [Object] params
       #   объект с информацией о параметрах действия
-      # @return [Hash]
-      #   результирующий ассоциативный массив
       def self.update(id, params)
         Update.new(id, params).update
       end

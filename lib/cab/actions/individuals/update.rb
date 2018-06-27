@@ -10,8 +10,6 @@ module Cab
         require_relative 'update/params_schema'
 
         # Обновляет поля записи физического лица
-        # @return [Hash]
-        #   результирующий ассоциативный массив
         def update
           record.update(individual_params)
         end

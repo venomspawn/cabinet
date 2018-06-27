@@ -16,6 +16,12 @@ module Cab
               type: %i[string null],
               pattern: /^[0-9]{12}$/
             },
+            commercial_name: {
+              type: %i[string null]
+            },
+            ogrn: {
+              type: :string
+            },
             registration_address: {
               type: :object,
               properties: {
@@ -114,20 +120,6 @@ module Cab
                   type: %i[string null]
                 }
               }
-            },
-            entrepreneur: {
-              type: :object,
-              properties: {
-                commercial_name: {
-                  type: %i[string null]
-                },
-                ogrn: {
-                  type: :string
-                }
-              },
-              required: %i[
-                ogrn
-              ]
             }
           }
         }.freeze

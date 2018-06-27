@@ -584,20 +584,12 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   end
 
   describe '.update' do
-    include described_class::Update::SpecHelper
-
     subject(:result) { described_class.update(id, params) }
 
     let(:id) { entrepreneur.id }
     let(:entrepreneur) { create(:entrepreneur) }
     let(:individual) { Cab::Models::Individual[entrepreneur.individual_id] }
     let(:params) { create('params/actions/entrepreneurs/update') }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { entrepreneur.reload.created_at }
@@ -607,10 +599,8 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       subject
       entrepreneur.reload
 
-      expect(entrepreneur.commercial_name).to be ==
-        params[:entrepreneur][:commercial_name]
-
-      expect(entrepreneur.ogrn).to be == params[:entrepreneur][:ogrn]
+      expect(entrepreneur.commercial_name).to be == params[:commercial_name]
+      expect(entrepreneur.ogrn).to be == params[:ogrn]
 
       expect(entrepreneur.actual_address.to_hash.symbolize_keys)
         .to be == params[:actual_address]
