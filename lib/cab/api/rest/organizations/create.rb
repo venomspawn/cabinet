@@ -19,7 +19,7 @@ module Cab
             #   ассоциативный массив, структура которого описана JSON-схемой
             #   {Actions::Organizations::Create::RESULT_SCHEMA}
             # @return [Status]
-            #   200
+            #   201
             controller.post '/organizations' do
               content = Actions::Organizations.create(request_body)
               status :created

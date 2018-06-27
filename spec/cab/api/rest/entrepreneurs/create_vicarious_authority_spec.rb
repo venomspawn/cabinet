@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 # Тестирование метода REST API, создающего записи связей между записями
-# физических лиц, их представителей и документов, подтверждающих личность
-# представителей
+# индивидуальных предпринимателей, их представителей и документов,
+# подтверждающих личность представителей
 
-RSpec.describe Cab::API::REST::Individuals::CreateVicariousAuthority do
-  describe 'POST /individuals/:id/vicarious_authority' do
+RSpec.describe Cab::API::REST::Entrepreneurs::CreateVicariousAuthority do
+  describe 'POST /entrepreneurs/:id/vicarious_authority' do
     include described_class::SpecHelper
 
-    subject { post "/individuals/#{id}/vicarious_authority", request_body }
+    subject { post "/entrepreneurs/#{id}/vicarious_authority", request_body }
 
     let(:id) { record.id }
-    let(:record) { create(:individual) }
+    let(:record) { create(:entrepreneur) }
     let(:request_body) { Oj.dump(params) }
-    let(:factory) { 'params/actions/individuals/create_vicarious_authority' }
+    let(:factory) { 'params/actions/entrepreneurs/create_vicarious_authority' }
     let(:params) { create(factory, traits) }
     let(:traits) { {} }
 
@@ -21,12 +21,13 @@ RSpec.describe Cab::API::REST::Individuals::CreateVicariousAuthority do
 
     it { is_expected.to have_proper_body(schema) }
 
-    it 'should call corresponding function of Cab::Actions::Individuals' do
-      expect(Cab::Actions::Individuals).to receive(:create_vicarious_authority)
+    it 'should call corresponding function of Cab::Actions::Entrepreneurs' do
+      expect(Cab::Actions::Entrepreneurs)
+        .to receive(:create_vicarious_authority)
       subject
     end
 
-    context 'when the record of individual isn\'t found' do
+    context 'when the record of entrepreneur isn\'t found' do
       let(:id) { create(:uuid) }
 
       it { is_expected.to be_not_found }

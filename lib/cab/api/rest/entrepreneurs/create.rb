@@ -20,7 +20,7 @@ module Cab
             #   ассоциативный массив, структура которого описана JSON-схемой
             #   {Actions::Entrepreneurs::Create::RESULT_SCHEMA}
             # @return [Status]
-            #   200
+            #   201
             controller.post '/entrepreneurs' do
               content = Actions::Entrepreneurs.create(request_body)
               status :created
