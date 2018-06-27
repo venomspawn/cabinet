@@ -16,13 +16,12 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def create
-          load_spokesman
           Sequel::Model.db.transaction(savepoint: true) do
             individual = process_individual
             record = create_entrepreneur(individual)
             vicarious_authority = create_vicarious_authority
             create_entrepreneur_spokesman(record, vicarious_authority)
-            values(record, individual)
+            individual.update(id: record.id)
           end
         end
 
@@ -36,15 +35,12 @@ module Cab
         # @return [NilClass]
         #   если запись индивидуального предпринимателя создаётся без указания
         #   записи представителя
-        attr_reader :spokesman
-
-        # Загружает запись представителя, если запись индивидуального
-        # предпринимателя создаётся с его указанием
         # @raise [Sequel::NoMatchingRow]
         #   если запись представителя не найдена
-        def load_spokesman
-          @spokesman = params[:spokesman]&.[](:id)
-          @spokesman &&= Models::Individual.select(:id).with_pk!(@spokesman)
+        def spokesman
+          return if params[:spokesman].nil?
+          @spokesman ||=
+            Models::Individual.select(:id).with_pk!(params[:spokesman][:id])
         end
 
         # Возвращает значение параметра `individual_id`
@@ -61,35 +57,38 @@ module Cab
         # информацией о физическом лице.
         # @return [Hash]
         #   результирующий ассоциативный массив
+        # @raise [Sequel::NoMatchingRow]
+        #   если запись физического лица не найдена
         def process_individual
           return Individuals.create(individual_params) if individual_id.nil?
-          Individuals.show(id: individual_id)
+          { id: Models::Individual.select(:id).with_pk!(individual_id).id }
         end
 
-        # Названия параметров создания записи физического лица
-        INDIVIDUAL_FIELDS = %i[
-          first_name
-          last_name
-          middle_name
-          birth_place
-          birth_date
-          sex
-          citizenship
-          snils
-          inn
-          registration_address
-          identity_document
-          consent_to_processing
-        ]
+        # Ассоциативный массив, отображающий названия ключей ассоциативного
+        # массива атрибутов записи физического лица в названия ключей
+        # ассоциативного массива параметров
+        INDIVIDUAL_FIELDS = {
+          first_name:            :first_name,
+          last_name:             :last_name,
+          middle_name:           :middle_name,
+          birth_place:           :birth_place,
+          birth_date:            :birth_date,
+          sex:                   :sex,
+          citizenship:           :citizenship,
+          snils:                 :snils,
+          inn:                   :inn,
+          registration_address:  :registration_address,
+          residential_address:   :registration_address,
+          identity_document:     :identity_document,
+          consent_to_processing: :consent_to_processing
+        }.freeze
 
         # Возвращает ассоциативный массив параметров создания записи
         # физического лица
         # @return [Hash]
         #   результирующий ассоциативный массив
         def individual_params
-          params.slice(*INDIVIDUAL_FIELDS).tap do |hash|
-            hash[:residential_address] = params[:registration_address]
-          end
+          extract_params(INDIVIDUAL_FIELDS)
         end
 
         # Создаёт и возвращает запись индивидуального предпринимателя
@@ -98,12 +97,21 @@ module Cab
         # @return [Cab::Models::Entrepreneur]
         #   созданная запись
         def create_entrepreneur(individual)
-          Models::Entrepreneur.unrestrict_primary_key
           record_params = entrepreneur_params(individual)
-          Models::Entrepreneur.create(record_params).tap do
-            Models::Entrepreneur.restrict_primary_key
-          end
+          create_unrestricted(:Entrepreneur, record_params)
         end
+
+        # Ассоциативный массив, отображающий названия ключей ассоциативного
+        # массива атрибутов записи индивидуального предпринимателя в названия
+        # ключей ассоциативного массива параметров
+        ENTREPRENEUR_FIELDS = {
+          id:              SecureRandom.method(:uuid),
+          actual_address:  :actual_address,
+          bank_details:    :bank_details,
+          commercial_name: :commercial_name,
+          ogrn:            :ogrn,
+          created_at:      Time.method(:now)
+        }
 
         # Возвращает ассоциативный массив параметров создания записи
         # индивидуального предпринимателя
@@ -112,14 +120,8 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def entrepreneur_params(individual)
-          {}.tap do |hash|
-            hash[:id]              = SecureRandom.uuid
-            hash[:commercial_name] = params[:entrepreneur][:commercial_name]
-            hash[:ogrn]            = params[:entrepreneur][:ogrn]
-            hash[:bank_details]    = params[:bank_details]
-            hash[:actual_address]  = params[:actual_address]
-            hash[:created_at]      = Time.now
-            hash[:individual_id]   = individual[:id]
+          extract_params(ENTREPRENEUR_FIELDS).tap do |hash|
+            hash[:individual_id] = individual[:id]
           end
         end
 
@@ -133,31 +135,31 @@ module Cab
         #   представителя
         def create_vicarious_authority
           return if spokesman.nil?
-          document_params = vicarious_authority_params
-          Models::VicariousAuthority.unrestrict_primary_key
-          Models::VicariousAuthority.create(document_params).tap do
-            Models::VicariousAuthority.restrict_primary_key
-          end
+          create_unrestricted(:VicariousAuthority, vicarious_authority_params)
         end
 
-        # Список названий полей записи документа, подтверждающего полномочия
-        # представителя, значения которых извлекаются из параметров действия
-        VICARIOUS_AUTHORITY_FIELDS =
-          %i[number series registry_number issued_by issue_date].freeze
+        # Ассоциативный массив, в котором сопоставляются названия полей записи
+        # документа, подтверждающего полномочия представителя, и способы
+        # извлечения значений этих полей из параметров действия
+        VICARIOUS_AUTHORITY_FIELDS = {
+          id:              SecureRandom.method(:uuid),
+          name:            %i[spokesman title],
+          number:          %i[spokesman number],
+          series:          %i[spokesman series],
+          registry_number: %i[spokesman registry_number],
+          issued_by:       %i[spokesman issued_by],
+          issue_date:      %i[spokesman issue_date],
+          expiration_date: %i[spokesman due_date],
+          content:         %i[spokesman content],
+          created_at:      Time.method(:now)
+        }.freeze
 
         # Возвращает ассоциативный массив полей записи документа,
         # подтверждающего полномочия представителя
         # @return [Hash]
         #   результирующий ассоциативный массив
         def vicarious_authority_params
-          param = params[:spokesman][:power_of_attorney]
-          param.slice(*VICARIOUS_AUTHORITY_FIELDS).tap do |hash|
-            hash[:id]              = SecureRandom.uuid
-            hash[:name]            = param[:title]
-            hash[:expiration_date] = param[:due_date]
-            hash[:content]         = param[:files].first[:content]
-            hash[:created_at]      = Time.now
-          end
+          extract_params(VICARIOUS_AUTHORITY_FIELDS)
         end
 
         # Создаёт запись связи между записями индивидуального предпринимателя и
@@ -173,9 +175,7 @@ module Cab
           return if vicarious_authority.nil?
           link_params =
             entrepreneur_spokesman_params(record, vicarious_authority)
-          Models::EntrepreneurSpokesman.unrestrict_primary_key
-          Models::EntrepreneurSpokesman.create(link_params)
-          Models::EntrepreneurSpokesman.restrict_primary_key
+          create_unrestricted(:EntrepreneurSpokesman, link_params)
         end
 
         # Возвращает ассоциативный массив полей записи связи между записями
@@ -193,58 +193,6 @@ module Cab
             entrepreneur_id:        record.id,
             vicarious_authority_id: vicarious_authority.id
           }
-        end
-
-        # Копирует атрибуты из одного объекта в другой и возвращает объект, в
-        # который копируются атрибуты
-        # @param [#[]=] destination
-        #   объект, в который копируются атрибуты
-        # @param [#[]] source
-        #   объект, из которого копируются атрибуты
-        # @param [Array] keys
-        #   названия атрибутов
-        # @return [Object]
-        #   объект, из которого копируются атрибуты
-        def copy_attributes(destination, source, *keys)
-          destination.tap { keys.each { |k| destination[k] = source[k] } }
-        end
-
-        # Названия полей ассоциативного массива атрибутов записи физического
-        # лица, копируемых в ассоциативный массив атрибутов записи
-        # индивидуального предпринимателя
-        INDIVIDUAL_VALUES_FIELDS = %i[
-          first_name
-          last_name
-          middle_name
-          birth_place
-          birth_date
-          sex
-          citizenship
-          inn
-          snils
-          registration_address
-          consent_to_processing
-        ]
-
-        # Возвращает ассоциативный массив атрибутов записи индивидуального
-        # предпринимателя
-        # @param [Cab::Models::Entrepreneur] record
-        #   запись индивидуального предпринимателя
-        # @param [Hash] individual
-        #   ассоциативный массив с информацией о физическом лице
-        # @return [Hash]
-        #   результирующий ассоциативный массив
-        def values(record, individual)
-          {}.tap do |hash|
-            copy_attributes(hash, individual, *INDIVIDUAL_VALUES_FIELDS)
-            copy_attributes(hash, params, :actual_address, :bank_details)
-
-            hash[:client_type]        = 'entrepreneur'
-            hash[:id]                 = record.id
-            hash[:identity_documents] = [params[:identity_document]]
-            hash[:entrepreneur] =
-              copy_attributes({}, record, :commercial_name, :ogrn)
-          end
         end
       end
     end

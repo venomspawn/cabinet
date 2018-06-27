@@ -5,9 +5,10 @@
 
 FactoryBot.define do
   factory 'params/actions/entrepreneurs/create', class: Hash do
-    actual_address { create(:address) }
-    bank_details   { create(:bank_details) }
-    entrepreneur   { create('params/entrepreneur') }
+    actual_address  { create(:address) }
+    bank_details    { create(:bank_details) }
+    commercial_name { create(:string) }
+    ogrn            { create(:string, length: 15) }
 
     trait :with_individual do
       first_name            { create(:string) }
@@ -21,7 +22,7 @@ FactoryBot.define do
       inn                   { create(:string, length: 12) }
       registration_address  { create(:address) }
       identity_document     { create('params/identity_document') }
-      consent_to_processing { [content: create(:string)] }
+      consent_to_processing { { content: create(:string) } }
     end
 
     trait :with_individual_id do
