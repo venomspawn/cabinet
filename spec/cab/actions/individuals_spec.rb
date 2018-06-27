@@ -6,7 +6,14 @@ RSpec.describe Cab::Actions::Individuals do
   describe 'the module' do
     subject { described_class }
 
-    names = %i[create lookup show update update_personal_info]
+    names = %i[
+      create
+      create_vicarious_authority
+      lookup
+      show
+      update
+      update_personal_info
+    ]
     it { is_expected.to respond_to(*names) }
   end
 
@@ -75,6 +82,122 @@ RSpec.describe Cab::Actions::Individuals do
             .and change { Cab::Models::IndividualSpokesman.count }
             .by(0)
         end
+      end
+    end
+
+    context 'when params is of String type' do
+      context 'when params is a JSON-string' do
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
+
+            it 'should raise JSON::Schema::ValidationError' do
+              expect { subject }.to raise_error(JSON::Schema::ValidationError)
+            end
+          end
+        end
+
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%w[not a map]) }
+
+          it 'should raise JSON::Schema::ValidationError' do
+            expect { subject }.to raise_error(JSON::Schema::ValidationError)
+          end
+        end
+      end
+
+      context 'when params is not a JSON-string' do
+        let(:params) { 'not a JSON-string' }
+
+        it 'should raise Oj::ParseError' do
+          expect { subject }.to raise_error(Oj::ParseError)
+        end
+      end
+    end
+
+    context 'when params is of Hash type' do
+      context 'when params is of wrong structure' do
+        let(:params) { { wrong: :structure } }
+
+        it 'should raise JSON::Schema::ValidationError' do
+          expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        end
+      end
+    end
+
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
+
+      it 'should raise JSON::Schema::ValidationError' do
+        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+      end
+    end
+  end
+
+  describe '.create_vicarious_authority' do
+    include described_class::CreateVicariousAuthority::SpecHelper
+
+    subject(:result) { described_class.create_vicarious_authority(id, params) }
+
+    let(:id) { record.id }
+    let(:record) { create(:individual) }
+    let(:factory) { 'params/actions/individuals/create_vicarious_authority' }
+    let(:params) { create(factory, traits) }
+    let(:traits) { {} }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to match_json_schema(schema) }
+    end
+
+    it 'should create a record of vicarious authority' do
+      expect { subject }
+        .to change { Cab::Models::VicariousAuthority.count }
+        .by(1)
+    end
+
+    it 'should create a record of link between individual and spokesman' do
+      expect { subject }
+        .to change { Cab::Models::IndividualSpokesman.count }
+        .by(1)
+    end
+
+    context 'when the record of individual isn\'t found' do
+      let(:id) { create(:uuid) }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when the record of spokesman isn\'t found' do
+      let(:traits) { { id: create(:uuid) } }
+
+      it 'should raise Sequel::NoMatchingRow' do
+        expect { subject }.to raise_error(Sequel::NoMatchingRow)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::NoMatchingRow)
+          .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
       end
     end
 

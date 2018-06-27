@@ -28,7 +28,7 @@ module Cab
       #   ассоциативный массив параметров действия
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.create(id, params)
+      def self.create_vicarious_authority(id, params)
         CreateVicariousAuthority.new(id, params).create
       end
 

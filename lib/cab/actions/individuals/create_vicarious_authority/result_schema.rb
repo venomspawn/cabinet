@@ -3,7 +3,7 @@
 module Cab
   module Actions
     module Individuals
-      class Create
+      class CreateVicariousAuthority
         # JSON-схема результата работы действия
         RESULT_SCHEMA = {
           type: :object,

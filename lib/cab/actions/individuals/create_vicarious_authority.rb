@@ -37,8 +37,8 @@ module Cab
           Sequel::Model.db.transaction(savepoint: true) do
             vicarious_authority = create_vicarious_authority
             create_individual_spokesman(vicarious_authority)
+            values(vicarious_authority)
           end
-          values(vicarious_authority)
         end
 
         private
