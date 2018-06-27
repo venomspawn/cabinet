@@ -516,19 +516,11 @@ RSpec.describe Cab::Actions::Individuals do
   end
 
   describe '.update' do
-    include described_class::Update::SpecHelper
-
     subject(:result) { described_class.update(id, params) }
 
     let(:id) { individual.id }
     let(:individual) { create(:individual) }
     let(:params) { create('params/actions/individuals/update') }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { individual.reload.created_at }
