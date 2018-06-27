@@ -455,19 +455,11 @@ RSpec.describe Cab::Actions::Organizations do
   end
 
   describe '.update' do
-    include described_class::Update::SpecHelper
-
     subject(:result) { described_class.update(id, params) }
 
     let(:id) { organization.id }
     let(:organization) { create(:organization) }
     let(:params) { create('params/actions/organizations/update') }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { organization.reload.created_at }
