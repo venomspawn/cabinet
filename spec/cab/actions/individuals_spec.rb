@@ -135,8 +135,6 @@ RSpec.describe Cab::Actions::Individuals do
   end
 
   describe '.create_vicarious_authority' do
-    include described_class::CreateVicariousAuthority::SpecHelper
-
     subject(:result) { described_class.create_vicarious_authority(id, params) }
 
     let(:id) { record.id }
@@ -144,12 +142,6 @@ RSpec.describe Cab::Actions::Individuals do
     let(:factory) { 'params/actions/individuals/create_vicarious_authority' }
     let(:params) { create(factory, traits) }
     let(:traits) { {} }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'should create a record of vicarious authority' do
       expect { subject }
@@ -183,7 +175,7 @@ RSpec.describe Cab::Actions::Individuals do
     end
 
     context 'when the record of spokesman isn\'t found' do
-      let(:traits) { { id: create(:uuid) } }
+      let(:traits) { { spokesman_id: create(:uuid) } }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)

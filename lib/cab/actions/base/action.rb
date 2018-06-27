@@ -62,13 +62,13 @@ module Cab
         # параметров согласно предоставленной схеме
         # @param [Hash] map
         #   ассоциативный массив со схемой, ключами которого являются названия
-        #   параметров, списки с названиями ключей или объекты с методом
-        #   `call`, по которым извлекаются значения, а значениями являются
-        #   названия ключей результирующего ассоциативного массива
+        #   ключей результирующего ассоциативного массива, а значениями —
+        #   названия параметров, списки с названиями ключей, объекты с методом
+        #   `call` или иные объекты, по которым извлекаются значения
         # @return [Hash]
         #   результирующий ассоциативный массив
         def extract_params(map)
-          map.each_with_object({}) do |(source, destination), memo|
+          map.each_with_object({}) do |(destination, source), memo|
             allowed, value = extract_param_value(source)
             memo[destination] = value if allowed
           end
@@ -114,6 +114,22 @@ module Cab
             memo.key?(key) ? memo[key] : (return [false, nil])
           end
           [true, value]
+        end
+
+        # Убирает ограничение на присваивание значения первичного ключа модели,
+        # создаёт запись модели, после чего возвращает ограничние на
+        # присваивание значения первичного ключа модели. Возвращает созданную
+        # запись.
+        # @param [String, Symbol] model_name
+        #   название модели в пространстве имён `Cab::Models`
+        # @param [Hash] creation_params
+        #   ассоциативный массив со значениями полей записи модели
+        # @return [Object]
+        #   созданная запись
+        def create_unrestricted(model_name, creation_params)
+          model = Models.const_get(model_name)
+          model.unrestrict_primary_key
+          model.create(creation_params).tap { model.restrict_primary_key }
         end
       end
     end

@@ -6,8 +6,6 @@
 
 RSpec.describe Cab::API::REST::Individuals::CreateVicariousAuthority do
   describe 'POST /individuals/:id/vicarious_authority' do
-    include described_class::SpecHelper
-
     subject { post "/individuals/#{id}/vicarious_authority", request_body }
 
     let(:id) { record.id }
@@ -17,9 +15,7 @@ RSpec.describe Cab::API::REST::Individuals::CreateVicariousAuthority do
     let(:params) { create(factory, traits) }
     let(:traits) { {} }
 
-    it { is_expected.to be_created }
-
-    it { is_expected.to have_proper_body(schema) }
+    it { is_expected.to be_no_content }
 
     it 'should call corresponding function of Cab::Actions::Individuals' do
       expect(Cab::Actions::Individuals).to receive(:create_vicarious_authority)
@@ -33,7 +29,7 @@ RSpec.describe Cab::API::REST::Individuals::CreateVicariousAuthority do
     end
 
     context 'when the record of spokesman isn\'t found' do
-      let(:traits) { { id: create(:uuid) } }
+      let(:traits) { { spokesman_id: create(:uuid) } }
 
       it { is_expected.to be_not_found }
     end
