@@ -7,7 +7,10 @@ module Cab
     module Entrepreneurs
       # Класс действий поиска информации об индивидуальных предпринимателях
       class Lookup < Base::Action
+        require_relative 'lookup/consts'
         require_relative 'lookup/params_schema'
+
+        include Consts
 
         # Возвращает ассоциативный массив с информацией об индивидуальных
         # предпринимателях
@@ -33,43 +36,8 @@ module Cab
           params[:birth_date]
         end
 
-        # Выражение для извлечения имени индивидуального предпринимателя
-        NAME = :name.qualify(:individuals)
-
-        # Выражение для извлечения фамилии индивидуального предпринимателя
-        SURNAME = :surname.qualify(:individuals)
-
-        # Выражение для извлечения отчества индивидуального предпринимателя
-        MIDDLE_NAME = :middle_name.qualify(:individuals)
-
-        # Выражение для извлечения даты рождения индивидуального
-        # предпринимателя
-        BIRTHDAY = :birthday.qualify(:individuals)
-
-        # Выражение для извлечения места рождения индивидуального
-        # предпринимателя
-        BIRTH_PLACE = :birth_place.qualify(:individuals)
-
-        # Выражение для извлечения ИНН индивидуального предпринимателя
-        INN = :inn.qualify(:individuals)
-
-        # Выражение для извлечения СНИЛС индивидуального предпринимателя
-        SNILS = :inn.qualify(:individuals)
-
         # Количество записей
         LIMIT = 10
-
-        # Ассоциативный массив, преобразующий названия параметров поиска в
-        # названия полей записей физических лиц
-        SEARCH_KEYS = {
-          first_name:  NAME,
-          middle_name: MIDDLE_NAME,
-          last_name:   SURNAME,
-          birth_date:  BIRTHDAY,
-          birth_place: BIRTH_PLACE,
-          inn:         INN,
-          snils:       SNILS
-        }.freeze
 
         # Возвращает ассоциативный массив, полученный из параметров поиска, из
         # которого исключены все пустые значения
@@ -82,40 +50,6 @@ module Cab
               memo[field] = value unless value.blank?
             end
         end
-
-        # Выражение для типа записи индивидуального предпринимателя
-        CLIENT_TYPE = 'entrepreneur'.as(:client_type)
-
-        # Выражение для извлечения идентификатора записи индивидуального
-        # предпринимателя
-        ID = :id.qualify(:entrepreneurs)
-
-        # Выражение для извлечения имени индивидуального предпринимателя в
-        # качестве поля результирующего ассоциативного массива
-        FIRST_NAME = NAME.as(:first_name)
-
-        # Выражение для извлечения фамилии индивидуального предпринимателя в
-        # качестве поля результирующего ассоциативного массива
-        LAST_NAME = SURNAME.as(:last_name)
-
-        # Выражение для извлечения даты рождения индивидуального
-        # предпринимателя в правильном формате в качестве поля результирующего
-        # ассоциативного массива
-        BIRTH_DATE =
-          :to_char.sql_function(BIRTHDAY, 'DD.MM.YYYY').as(:birth_date)
-
-        # Поля записей индивидуальных предпринимателей, извлекаемые из базы
-        # данных
-        FIELDS = [
-          CLIENT_TYPE,
-          ID,
-          FIRST_NAME,
-          LAST_NAME,
-          MIDDLE_NAME,
-          BIRTH_DATE,
-          BIRTH_PLACE,
-          INN
-        ].freeze
 
         # Возвращает запрос Sequel на извлечение информации об индивидуальных
         # предпренимателях
@@ -164,21 +98,6 @@ module Cab
             .exclude(id: Models::Entrepreneur.select(:individual_id))
         end
 
-        # Названия параметров поиска, по которым производится нечёткий поиск
-        FUZZY_KEYS = %i[first_name middle_name last_name birth_place].freeze
-
-        # Поля записей физических лиц, извлекаемые из базы данных
-        INDIVIDUAL_FIELDS = [
-          'individual'.as(:client_type),
-          :id,
-          NAME,
-          LAST_NAME,
-          MIDDLE_NAME,
-          BIRTH_DATE,
-          BIRTH_PLACE,
-          INN
-        ].freeze
-
         # Возвращает пустой список, если список, возвращаемый методом {exact},
         # не пуст или все параметры поиска, отвечающие имени, фамилии, отчеству
         # и месту рождения, пусты. В противном случае возвращает список
@@ -205,15 +124,26 @@ module Cab
         # @return [Sequel::Dataset]
         #   результирующий запрос Sequel
         def fuzzy_dataset(dataset)
-          dataset =
-            dataset.where(BIRTHDAY => birth_date) if birth_date.present?
-          FUZZY_KEYS.each do |key|
+          condition = { BIRTHDAY => birth_date }
+          dataset = dataset.where(condition) if birth_date.present?
+          fuzzy_percents_dataset(dataset)
+            .order_by(total_distance.asc)
+            .limit(LIMIT)
+        end
+
+        # Возвращает запрос Sequel, полученный из предоставленного добавлением
+        # условий на похожесть значений полей и значений параметров
+        # @param [Sequel::Dataset] dataset
+        #   запрос Sequel
+        # @return [Sequel::Dataset]
+        #   результирующий запрос Sequel
+        def fuzzy_percents_dataset(dataset)
+          FUZZY_KEYS.inject(dataset) do |memo, key|
             value = params[key]
-            next if value.blank?
+            next memo if value.blank?
             condition = percent_expression(SEARCH_KEYS[key], value)
-            dataset = dataset.where(condition)
+            memo.where(condition)
           end
-          dataset.order_by(total_distance.asc).limit(LIMIT)
         end
 
         # Возвращает выражение Sequel для проверки, что похожесть значения поля
@@ -227,15 +157,6 @@ module Cab
         def percent_expression(field, value)
           "\"#{field.table}\".\"#{field.column}\" % '#{value}'".lit
         end
-
-        # Ассоциативный массив, в котором названия параметров поиска
-        # сопоставляются их веса в вычислении общей похожести
-        WEIGHTS = {
-          last_name:   1.0,
-          first_name:  1.5,
-          middle_name: 2.0,
-          birth_place: 1.8
-        }
 
         # Возвращает выражение Sequel для вычисления общей похожести
         # @return [Sequel::SQL::Expression]

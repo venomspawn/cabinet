@@ -115,7 +115,8 @@ RSpec.describe Cab::Models::VicariousAuthority do
 
       context 'when value of `issue_date` property is of String' do
         context 'when the value is not a date\'s representation' do
-          let(:params) { attributes_for(:vicarious_authority, issue_date: value) }
+          let(:params) { attributes_for(:vicarious_authority, traits) }
+          let(:traits) { { issue_date: value } }
           let(:value) { 'not a date\'s representation' }
 
           it 'should raise Sequel::InvalidValue' do
@@ -199,7 +200,7 @@ RSpec.describe Cab::Models::VicariousAuthority do
       it { is_expected.to be_a(String) }
 
       it 'should be an UUID' do
-        expect(subject).to match /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/
+        expect(subject).to match(/^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/)
       end
     end
   end

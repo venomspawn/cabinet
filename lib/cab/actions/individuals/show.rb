@@ -85,7 +85,7 @@ module Cab
           :to_char.sql_function(:issue_date, 'DD.MM.YYYY').as(:issue_date),
           :to_char.sql_function(:expiration_end, 'DD.MM.YYYY').as(:due_date),
           :content
-        ]
+        ].freeze
 
         # Возвращает список с информацией о документах, удостоверяющих личность
         # @return [Array]

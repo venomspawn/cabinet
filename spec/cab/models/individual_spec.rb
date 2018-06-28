@@ -271,7 +271,7 @@ RSpec.describe Cab::Models::Individual do
       it { is_expected.to be_a(String) }
 
       it 'should be an UUID' do
-        expect(subject).to match /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/
+        expect(subject).to match(/^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/)
       end
     end
   end
@@ -416,7 +416,7 @@ RSpec.describe Cab::Models::Individual do
         it { is_expected.to be_a(String) }
 
         it 'should satisfy the format' do
-          expect(subject).to match /^\d{3}-\d{3}-\d{3} \d{2}$/
+          expect(subject).to match(/^\d{3}-\d{3}-\d{3} \d{2}$/)
         end
       end
     end
@@ -440,7 +440,7 @@ RSpec.describe Cab::Models::Individual do
         it { is_expected.to be_a(String) }
 
         it 'should satisfy the format' do
-          expect(subject).to match /^\d{12}$/
+          expect(subject).to match(/^\d{12}$/)
         end
       end
     end

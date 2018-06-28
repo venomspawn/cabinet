@@ -1,4 +1,4 @@
-# frozen_:string_literal: true
+# frozen_string_literal: true
 
 module Cab
   module Actions
@@ -34,7 +34,7 @@ module Cab
                   },
                   birth_date: {
                     type: :string
-                  },
+                  }
                 },
                 required: %i[
                   client_type
@@ -74,7 +74,7 @@ module Cab
                   },
                   birth_date: {
                     type: :string
-                  },
+                  }
                 },
                 required: %i[
                   client_type
@@ -114,7 +114,7 @@ module Cab
                   },
                   birth_date: {
                     type: :string
-                  },
+                  }
                 },
                 required: %i[
                   client_type

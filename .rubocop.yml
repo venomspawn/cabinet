@@ -18,10 +18,16 @@ Metrics/BlockLength:
     - Rakefile
     - Vagrantfile
 
+Metrics/ClassLength:
+  Exclude:
+    - lib/**/params_schema.rb
+    - lib/**/result_schema.rb
+
 Naming/UncommunicativeMethodParamName:
   AllowedNames:
     - db
     - to
+    - id
 
 Style/AsciiComments:
   Enabled: false

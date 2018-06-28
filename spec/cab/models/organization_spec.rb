@@ -261,7 +261,7 @@ RSpec.describe Cab::Models::Organization do
       it { is_expected.to be_a(String) }
 
       it 'should be an UUID' do
-        expect(subject).to match /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/
+        expect(subject).to match(/^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/)
       end
     end
   end
@@ -365,7 +365,7 @@ RSpec.describe Cab::Models::Organization do
       it { is_expected.to be_a(String) }
 
       it 'should satisfy the format' do
-        expect(subject).to match /^\d{10}$/
+        expect(subject).to match(/^\d{10}$/)
       end
     end
   end
@@ -381,7 +381,7 @@ RSpec.describe Cab::Models::Organization do
       it { is_expected.to be_a(String) }
 
       it 'should satisfy the format' do
-        expect(subject).to match /^\d{9}$/
+        expect(subject).to match(/^\d{9}$/)
       end
     end
   end
@@ -397,7 +397,7 @@ RSpec.describe Cab::Models::Organization do
       it { is_expected.to be_a(String) }
 
       it 'should satisfy the format' do
-        expect(subject).to match /^\d{13}$/
+        expect(subject).to match(/^\d{13}$/)
       end
     end
   end
@@ -506,7 +506,7 @@ RSpec.describe Cab::Models::Organization do
       context 'when the value is of String' do
         let(:value) { create(:string) }
 
-        it 'should set `chief_middle_name` attribute of the instance to the value' do
+        it 'should set `chief_middle_name` attribute to the value' do
           expect { subject }.to change { instance.chief_middle_name }.to(value)
         end
       end

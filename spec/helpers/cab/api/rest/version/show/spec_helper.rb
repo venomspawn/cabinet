@@ -17,7 +17,7 @@ module Cab
                 },
                 hostname: {
                   type: :string
-                },
+                }
               },
               required: %i[
                 version

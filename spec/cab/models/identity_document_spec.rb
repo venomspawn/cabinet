@@ -239,7 +239,7 @@ RSpec.describe Cab::Models::IdentityDocument do
       it { is_expected.to be_a(String) }
 
       it 'should be an UUID' do
-        expect(subject).to match /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/
+        expect(subject).to match(/^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/)
       end
     end
   end
@@ -395,7 +395,7 @@ RSpec.describe Cab::Models::IdentityDocument do
       it { is_expected.to be_a(String) }
 
       it 'should be an UUID' do
-        expect(subject).to match /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/
+        expect(subject).to match(/^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/)
       end
 
       let(:individual) { Cab::Models::Individual.where(id: subject).first }
