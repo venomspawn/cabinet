@@ -86,21 +86,8 @@ module Cab
                   due_date: {
                     type: %i[null string]
                   },
-                  files: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      properties: {
-                        content: {
-                          type: :string
-                        }
-                      },
-                      required: %i[
-                        content
-                      ],
-                      additionalProperties: false
-                    },
-                    minItems: 1
+                  content: {
+                    type: :string
                   }
                 },
                 required: %i[
@@ -110,27 +97,23 @@ module Cab
                   issued_by
                   issue_date
                   due_date
-                  files
+                  content
                 ],
                 additionalProperties: false
               },
               minItems: 1
             },
             consent_to_processing: {
-              type: :array,
-              items: {
-                type: :object,
-                properties: {
-                  content: {
-                    type: :string
-                  }
-                },
-                required: %i[
-                  content
-                ],
-                additionalProperties: false
+              type: :object,
+              properties: {
+                content: {
+                  type: :string
+                }
               },
-              minItems: 1
+              required: %i[
+                content
+              ],
+              additionalProperties: false
             }
           },
           required: %i[
