@@ -17,6 +17,7 @@ group :development, :test do
   gem 'factory_bot'
   gem 'rspec'
   gem 'yard'
+  gem 'yard-sinatra', git: 'https://github.com/OwnLocal/yard-sinatra.git'
 end
 
 group :test do
