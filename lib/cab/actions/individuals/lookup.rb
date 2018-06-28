@@ -18,19 +18,12 @@ module Cab
 
         private
 
-        # Поля записей физических лиц, извлекаемые из базы данных
-        FIELDS = [
-          'individual'.as(:client_type),
-          :id,
-          :name.as(:first_name),
-          :surname.as(:last_name),
-          :middle_name,
-          :birth_place,
-          :to_char.sql_function(:birthday, 'DD.MM.YYYY').as(:birth_date)
-        ].freeze
-
-        # Количество записей
-        LIMIT = 10
+        # Возвращает значение параметра `last_name`
+        # @return [Object]
+        #   значение параметра `last_name`
+        def last_name
+          params[:last_name]
+        end
 
         # Ассоциативный массив, преобразующий названия параметров поиска в
         # названия полей записей физических лиц
@@ -44,20 +37,6 @@ module Cab
           snils:       :snils
         }.freeze
 
-        # Возвращает значение параметра `last_name`
-        # @return [Object]
-        #   значение параметра `last_name`
-        def last_name
-          params[:last_name]
-        end
-
-        # Возвращает значение параметра `birth_date`
-        # @return [Object]
-        #   значение параметра `birth_date`
-        def birth_date
-          params[:birth_date]
-        end
-
         # Возвращает ассоциативный массив, полученный из параметров поиска, из
         # которого исключены все пустые значения
         # @return [Hash]
@@ -70,18 +49,30 @@ module Cab
             end
         end
 
+        # Поля записей физических лиц, извлекаемые из базы данных
+        FIELDS = [
+          'individual'.as(:client_type),
+          :id,
+          :name.as(:first_name),
+          :surname.as(:last_name),
+          :middle_name,
+          :birth_place,
+          :to_char.sql_function(:birthday, 'DD.MM.YYYY').as(:birth_date)
+        ].freeze
+
+        # Максимальное количество возвращаемых записей
+        LIMIT = 10
+
+        # Запрос Sequel на извлечение записей физических лиц
+        INDIVIDUALS_DATASET =
+          Models::Individual.naked.select(*FIELDS).limit(LIMIT)
+
         # Возвращает список ассоциативных массивов с информацией о физических
         # лицах, найденной по точному совпадению с параметрами поиска
         # @return [Array]
         #   результирующий список
         def exact
-          @exact ||=
-            Models::Individual
-            .naked
-            .select(*FIELDS)
-            .where(search_params)
-            .limit(LIMIT)
-            .to_a
+          @exact ||= INDIVIDUALS_DATASET.where(search_params).to_a
         end
 
         # Возвращает пустой список, если фамилия не предоставлена в качестве
@@ -93,104 +84,24 @@ module Cab
         def without_last_name
           return [] if last_name.blank?
           search_params_without_last_name = search_params.except(:surname)
-          Models::Individual
-            .naked
-            .select(*FIELDS)
+          INDIVIDUALS_DATASET
             .where(search_params_without_last_name)
             .exclude(surname: last_name)
-            .limit(LIMIT)
             .to_a
         end
 
-        # Названия параметров поиска, по которым производится нечёткий поиск
-        FUZZY_KEYS = %i[first_name middle_name last_name birth_place].freeze
-
-        # Возвращает пустой список, если список, возвращаемый методом {exact},
-        # не пуст или все параметры поиска, отвечающие имени, фамилии, отчеству
-        # и месту рождения, пусты. В противном случае возвращает список
-        # ассоциативных массивов с информацией о физических лицах, найденной по
-        # точному совпадению даты рождения и по неточному совпадению фамилии,
-        # имени, отчества и места рождения.
+        # Возвращает пустой список, если метод {exact} возвращает непустой
+        # список или непустые параметры нечёткого поиска отсуствуют, в
+        # противном случае возвращает список ассоциативных массивов с
+        # информацией о физических лицах, найденной по точному совпадению даты
+        # рождения и по неточному совпадению фамилии, имени, отчества и места
+        # рождения
         # @return [Array]
         #   результирующий список
         def fuzzy
-          return [] if exact.present?
-          return [] if params.values_at(*FUZZY_KEYS).all?(&:blank?)
-          fuzzy_dataset.to_a
-        end
-
-        # Возвращает запрос Sequel на извлечение записей физических лиц по
-        # неточному совпадению (см. {fuzzy})
-        # @return [Sequel::Dataset]
-        #   результирующий запрос Sequel
-        def fuzzy_dataset
-          dataset = Models::Individual.naked.select(*FIELDS)
-          dataset = dataset.where(birthday: birth_date) if birth_date.present?
-          fuzzy_percents_dataset(dataset)
-            .order_by(total_distance.asc)
-            .limit(LIMIT)
-        end
-
-        # Возвращает запрос Sequel, полученный из предоставленного добавлением
-        # условий на похожесть значений полей и значений параметров
-        # @param [Sequel::Dataset] dataset
-        #   запрос Sequel
-        # @return [Sequel::Dataset]
-        #   результирующий запрос Sequel
-        def fuzzy_percents_dataset(dataset)
-          FUZZY_KEYS.inject(dataset) do |memo, key|
-            value = params[key]
-            next memo if value.blank?
-            condition = percent_expression(SEARCH_KEYS[key], value)
-            memo.where(condition)
-          end
-        end
-
-        # Возвращает выражение Sequel для проверки, что похожесть значения поля
-        # и предоставленного значения выше порога
-        # @param [#to_s] field
-        #   название поля
-        # @param [#to_s] value
-        #   значение
-        # @return [Sequel::SQL::Expression]
-        #   результирующее выражение Sequel
-        def percent_expression(field, value)
-          Sequel.lit("\"#{field}\" % '#{value}'")
-        end
-
-        # Ассоциативный массив, в котором названия параметров поиска
-        # сопоставляются их веса в вычислении общей похожести
-        WEIGHTS = {
-          last_name:   1.0,
-          first_name:  1.5,
-          middle_name: 2.0,
-          birth_place: 1.8
-        }.freeze
-
-        # Возвращает выражение Sequel для вычисления общей похожести
-        # @return [Sequel::SQL::Expression]
-        #   результирующие выражение Sequel
-        def total_distance
-          expressions = FUZZY_KEYS.each_with_object([]) do |key, memo|
-            value = params[key]
-            next if value.blank?
-            memo << similarity_distance(SEARCH_KEYS[key], value, WEIGHTS[key])
-          end
-          expressions.inject(:+)
-        end
-
-        # Возвращает выражение Sequel для вычисления похожести значения поля и
-        # предоставленной строки, умноженного на вес
-        # @param [#to_s] field
-        #   название поля
-        # @param [#to_s] value
-        #   строка
-        # @param [#to_s] weight
-        #   вес
-        # @return [Sequel::SQL::Expression]
-        #   результирующее выражение Sequel
-        def similarity_distance(field, value, weight)
-          Sequel.lit("(\"#{field}\" <-> '#{value}') * #{weight}")
+          return [] unless exact.empty?
+          engine = Cab::Lookup::Fuzzy.new(params)
+          engine.empty_params? ? [] : engine.dataset(INDIVIDUALS_DATASET).to_a
         end
       end
     end
