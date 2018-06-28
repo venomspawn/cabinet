@@ -36,7 +36,7 @@ module Cab
           # @return [Array]
           #   результирующий список записей
           def create_entrepreneurs(count, traits = {})
-            count.times.map do
+            Array.new(count) do
               individual = FactoryBot.create(:individual, traits)
               FactoryBot.create(:entrepreneur, individual_id: individual.id)
             end

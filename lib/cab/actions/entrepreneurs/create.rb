@@ -111,7 +111,7 @@ module Cab
           commercial_name: :commercial_name,
           ogrn:            :ogrn,
           created_at:      Time.method(:now)
-        }
+        }.freeze
 
         # Возвращает ассоциативный массив параметров создания записи
         # индивидуального предпринимателя

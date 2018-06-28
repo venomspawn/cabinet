@@ -126,13 +126,24 @@ module Cab
         def fuzzy_dataset
           dataset = Models::Individual.naked.select(*FIELDS)
           dataset = dataset.where(birthday: birth_date) if birth_date.present?
-          FUZZY_KEYS.each do |key|
+          fuzzy_percents_dataset(dataset)
+            .order_by(total_distance.asc)
+            .limit(LIMIT)
+        end
+
+        # Возвращает запрос Sequel, полученный из предоставленного добавлением
+        # условий на похожесть значений полей и значений параметров
+        # @param [Sequel::Dataset] dataset
+        #   запрос Sequel
+        # @return [Sequel::Dataset]
+        #   результирующий запрос Sequel
+        def fuzzy_percents_dataset(dataset)
+          FUZZY_KEYS.inject(dataset) do |memo, key|
             value = params[key]
-            next if value.blank?
+            next memo if value.blank?
             condition = percent_expression(SEARCH_KEYS[key], value)
-            dataset = dataset.where(condition)
+            memo.where(condition)
           end
-          dataset.order_by(total_distance.asc).limit(LIMIT)
         end
 
         # Возвращает выражение Sequel для проверки, что похожесть значения поля

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop: disable Metrics/LineLength
+
 module Cab
   module API
     module REST
@@ -33,3 +35,5 @@ module Cab
     end
   end
 end
+
+# rubocop: enable Metrics/LineLength

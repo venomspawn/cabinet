@@ -338,7 +338,7 @@ RSpec.describe Cab::Actions::Individuals do
 
         context 'when there are fuzzy matches' do
           let!(:fuzzy) { create_list(:individual, limit + 1, fuzzy_traits) }
-          let(:fuzzy_traits){ { name: fuzzy_first_name } }
+          let(:fuzzy_traits) { { name: fuzzy_first_name } }
           let(:fuzzy_first_name) { "#{first_name}f" }
 
           it 'should have the matched info in `fuzzy`' do

@@ -47,7 +47,7 @@ module Cab
           :actual_address.cast(:text),
           :bank_details.cast(:text),
           :individual_id
-        ]
+        ].freeze
 
         # Возвращает ассоциативный массив полей записи индивидуального
         # предпринимателя
@@ -85,7 +85,7 @@ module Cab
           registration_address
           consent_to_processing
           identity_documents
-        ]
+        ].freeze
 
         # Добавляет в ассоциативный массив с информацией об индивидуальном
         # предпринимателе информацию о физическом лице

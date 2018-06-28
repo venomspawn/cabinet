@@ -42,7 +42,7 @@ module Cab
         # @return [Sequel::SQL::Expression]
         #   результирующее выражение
         def search_params(*search_keys)
-          expressions = search_keys.each_with_object([]) do |key, memo|
+          search_keys.each_with_object([]) do |key, memo|
             value = params[key]
             next if value.blank?
             memo << if key == :legal_address

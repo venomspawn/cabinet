@@ -63,7 +63,7 @@ module Cab
           bank_details:    :bank_details,
           commercial_name: :commercial_name,
           ogrn:            :ogrn
-        }
+        }.freeze
 
         # Возвращает ассоциативный массив параметров обновления записи
         # индивидуального предпринимателя

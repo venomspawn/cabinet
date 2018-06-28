@@ -102,10 +102,7 @@ module Cab
       begin
         require filepath
       rescue StandardError => error
-        puts <<-MESSAGE.squish
-          При загрузке файла по пути `#{filepath}` произошла ошибка
-          `#{error.class}`: `#{error.message}`
-        MESSAGE
+        puts "`#{filepath}`: `#{error.class}`: `#{error.message}`"
       end
     end
   end

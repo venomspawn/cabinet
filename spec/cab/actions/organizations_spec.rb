@@ -319,7 +319,7 @@ RSpec.describe Cab::Actions::Organizations do
 
         context 'when there are fuzzy matches' do
           let!(:fuzzy) { create_list(:organization, lim + 1, fuzzy_traits) }
-          let(:fuzzy_traits){ { full_name: fuzzy_full_name } }
+          let(:fuzzy_traits) { { full_name: fuzzy_full_name } }
           let(:fuzzy_full_name) { "#{full_name}f" }
 
           it 'should have the matched info in `fuzzy`' do
