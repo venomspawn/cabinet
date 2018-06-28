@@ -44,28 +44,18 @@ module Cab
             snils: {
               type: %i[null string]
             },
+            commercial_name: {
+              type: %i[null string]
+            },
+            ogrn: {
+              type: :string
+            },
             registration_address: {
             },
             actual_address: {
               type: %i[string number object array boolean]
             },
             bank_details: {
-            },
-            entrepreneur: {
-              type: :object,
-              properties: {
-                commercial_name: {
-                  type: %i[null string]
-                },
-                ogrn: {
-                  type: :string
-                }
-              },
-              required: %i[
-                commercial_name
-                ogrn
-              ],
-              additionalProperties: false
             },
             identity_documents: {
               type: :array,
@@ -104,21 +94,8 @@ module Cab
                   due_date: {
                     type: %i[null string]
                   },
-                  files: {
-                    type: :array,
-                    items: {
-                      type: :object,
-                      properties: {
-                        content: {
-                          type: :string
-                        }
-                      },
-                      required: %i[
-                        content
-                      ],
-                      additionalProperties: false
-                    },
-                    minItems: 1
+                  content: {
+                    type: :string
                   }
                 },
                 required: %i[
@@ -128,27 +105,23 @@ module Cab
                   issued_by
                   issue_date
                   due_date
-                  files
+                  content
                 ],
                 additionalProperties: false
               },
               minItems: 1
             },
             consent_to_processing: {
-              type: :array,
-              items: {
-                type: :object,
-                properties: {
-                  content: {
-                    type: :string
-                  }
-                },
-                required: %i[
-                  content
-                ],
-                additionalProperties: false
+              type: :object,
+              properties: {
+                content: {
+                  type: :string
+                }
               },
-              minItems: 1
+              required: %i[
+                content
+              ],
+              additionalProperties: false
             }
           },
           required: %i[
@@ -163,10 +136,11 @@ module Cab
             citizenship
             inn
             snils
+            commercial_name
+            ogrn
             registration_address
             actual_address
             bank_details
-            entrepreneur
           ],
           additionalProperties: false
         }.freeze
