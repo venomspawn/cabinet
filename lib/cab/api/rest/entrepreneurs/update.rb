@@ -11,20 +11,15 @@ module Cab
           # @param [Cab::API::REST::Controller] controller
           #   контроллер
           def self.registered(controller)
-            # Обновляет поля записи индивидуального предпринимателя и
-            # возвращает информацию об обновлённой записи
+            # Обновляет поля записи индивидуального предпринимателя
             # @param [Hash] params
             #   ассоциативный массив, структура которого описана JSON-схемой
             #   {Actions::Entrepreneurs::Update::PARAMS_SCHEMA}
-            # @return [Hash]
-            #   ассоциативный массив, структура которого описана JSON-схемой
-            #   {Actions::Entrepreneurs::Update::RESULT_SCHEMA}
             # @return [Status]
             #   200
             controller.put '/entrepreneurs/:id' do |id|
-              content = Actions::Entrepreneurs.update(id, request_body)
-              status :ok
-              body Oj.dump(content)
+              Actions::Entrepreneurs.update(id, request_body)
+              status :no_content
             end
           end
         end

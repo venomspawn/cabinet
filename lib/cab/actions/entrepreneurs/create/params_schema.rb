@@ -42,6 +42,12 @@ module Cab
                   type: %i[string null],
                   pattern: /^[0-9]{12}$/
                 },
+                commercial_name: {
+                  type: %i[string null]
+                },
+                ogrn: {
+                  type: :string
+                },
                 registration_address: {
                   type: :object,
                   properties: {
@@ -159,20 +165,8 @@ module Cab
                     due_date: {
                       type: %i[string null]
                     },
-                    files: {
-                      type: :array,
-                      items: {
-                        type: :object,
-                        properties: {
-                          content: {
-                            type: :string
-                          }
-                        },
-                        required: %i[
-                          content
-                        ]
-                      },
-                      minItems: 1
+                    content: {
+                      type: :string
                     }
                   },
                   required: %i[
@@ -180,23 +174,19 @@ module Cab
                     series
                     issued_by
                     issue_date
-                    files
+                    content
                   ]
                 },
                 consent_to_processing: {
-                  type: :array,
-                  items: {
-                    type: :object,
-                    properties: {
-                      content: {
-                        type: :string
-                      }
-                    },
-                    required: %i[
-                      content
-                    ]
+                  type: :object,
+                  properties: {
+                    content: {
+                      type: :string
+                    }
                   },
-                  minItems: 1
+                  required: %i[
+                    content
+                  ]
                 },
                 bank_details: {
                   type: %i[object null],
@@ -215,76 +205,43 @@ module Cab
                     }
                   }
                 },
-                entrepreneur: {
-                  type: :object,
-                  properties: {
-                    commercial_name: {
-                      type: %i[string null]
-                    },
-                    ogrn: {
-                      type: :string
-                    }
-                  },
-                  required: %i[
-                    ogrn
-                  ]
-                },
                 spokesman: {
                   type: %i[object null],
                   properties: {
                     id: {
                       type: :string
                     },
-                    power_of_attorney: {
-                      type: :object,
-                      properties: {
-                        title: {
-                          type: :string
-                        },
-                        number: {
-                          type: %i[string null]
-                        },
-                        series: {
-                          type: %i[string null]
-                        },
-                        registry_number: {
-                          type: %i[string null]
-                        },
-                        issued_by: {
-                          type: :string
-                        },
-                        issue_date: {
-                          type: :string
-                        },
-                        due_date: {
-                          type: %i[string null]
-                        },
-                        files: {
-                          type: :array,
-                          items: {
-                            type: :object,
-                            properties: {
-                              content: {
-                                type: :string
-                              }
-                            },
-                            required: %i[
-                              content
-                            ]
-                          },
-                          minItems: 1
-                        }
-                      },
-                      required: %i[
-                        title
-                        issued_by
-                        issue_date
-                      ]
+                    title: {
+                      type: :string
+                    },
+                    number: {
+                      type: %i[string null]
+                    },
+                    series: {
+                      type: %i[string null]
+                    },
+                    registry_number: {
+                      type: %i[string null]
+                    },
+                    issued_by: {
+                      type: :string
+                    },
+                    issue_date: {
+                      type: :string
+                    },
+                    due_date: {
+                      type: %i[string null]
+                    },
+                    content: {
+                      type: :string
                     }
                   },
                   required: %i[
                     id
-                    power_of_attorney
+                    title
+                    issued_by
+                    issue_date
+                    content
                   ]
                 }
               },
@@ -295,17 +252,23 @@ module Cab
                 inn
                 sex
                 citizenship
+                ogrn
                 registration_address
                 actual_address
                 identity_document
                 consent_to_processing
-                entrepreneur
               ]
             },
             {
               type: :object,
               properties: {
                 individual_id: {
+                  type: :string
+                },
+                commercial_name: {
+                  type: %i[string null]
+                },
+                ogrn: {
                   type: :string
                 },
                 actual_address: {
@@ -366,84 +329,50 @@ module Cab
                     }
                   }
                 },
-                entrepreneur: {
-                  type: :object,
-                  properties: {
-                    commercial_name: {
-                      type: %i[string null]
-                    },
-                    ogrn: {
-                      type: :string
-                    }
-                  },
-                  required: %i[
-                    ogrn
-                  ]
-                },
                 spokesman: {
                   type: %i[object null],
                   properties: {
                     id: {
                       type: :string
                     },
-                    power_of_attorney: {
-                      type: :object,
-                      properties: {
-                        title: {
-                          type: :string
-                        },
-                        number: {
-                          type: %i[string null]
-                        },
-                        series: {
-                          type: %i[string null]
-                        },
-                        registry_number: {
-                          type: %i[string null]
-                        },
-                        issued_by: {
-                          type: :string
-                        },
-                        issue_date: {
-                          type: :string
-                        },
-                        due_date: {
-                          type: %i[string null]
-                        },
-                        files: {
-                          type: :array,
-                          items: {
-                            type: :object,
-                            properties: {
-                              content: {
-                                type: :string
-                              }
-                            },
-                            required: %i[
-                              content
-                            ]
-                          },
-                          minItems: 1
-                        }
-                      },
-                      required: %i[
-                        title
-                        issued_by
-                        issue_date
-                        files
-                      ]
+                    title: {
+                      type: :string
+                    },
+                    number: {
+                      type: %i[string null]
+                    },
+                    series: {
+                      type: %i[string null]
+                    },
+                    registry_number: {
+                      type: %i[string null]
+                    },
+                    issued_by: {
+                      type: :string
+                    },
+                    issue_date: {
+                      type: :string
+                    },
+                    due_date: {
+                      type: %i[string null]
+                    },
+                    content: {
+                      type: :string
                     }
                   },
                   required: %i[
                     id
-                    power_of_attorney
+                    title
+                    issued_by
+                    issue_date
+                    content
                   ]
                 }
               },
               required: %i[
                 individual_id
+                ogrn
                 actual_address
-                entrepreneur
               ]
             }
           ]

@@ -114,8 +114,6 @@ RSpec.describe Cab::Actions::Organizations do
   end
 
   describe '.create_vicarious_authority' do
-    include described_class::CreateVicariousAuthority::SpecHelper
-
     subject(:result) { described_class.create_vicarious_authority(id, params) }
 
     let(:id) { record.id }
@@ -123,12 +121,6 @@ RSpec.describe Cab::Actions::Organizations do
     let(:factory) { 'params/actions/organizations/create_vicarious_authority' }
     let(:params) { create(factory, traits) }
     let(:traits) { {} }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'should create a record of vicarious authority' do
       expect { subject }
@@ -162,7 +154,7 @@ RSpec.describe Cab::Actions::Organizations do
     end
 
     context 'when the record of spokesman isn\'t found' do
-      let(:traits) { { id: create(:uuid) } }
+      let(:traits) { { spokesman_id: create(:uuid) } }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)
@@ -463,19 +455,11 @@ RSpec.describe Cab::Actions::Organizations do
   end
 
   describe '.update' do
-    include described_class::Update::SpecHelper
-
     subject(:result) { described_class.update(id, params) }
 
     let(:id) { organization.id }
     let(:organization) { create(:organization) }
     let(:params) { create('params/actions/organizations/update') }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { organization.reload.created_at }

@@ -15,7 +15,7 @@ RSpec.describe Cab::API::REST::Entrepreneurs::UpdatePersonalInfo do
     let(:factory) { 'params/actions/entrepreneurs/update_personal_info' }
     let(:params) { create(factory) }
 
-    it { is_expected.to be_ok }
+    it { is_expected.to be_created }
 
     it { is_expected.to have_proper_body(schema) }
 

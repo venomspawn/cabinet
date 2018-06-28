@@ -19,7 +19,6 @@ module Cab
             expand_json(result, :actual_address)
             expand_json(result, :bank_details)
             inject_individual_info(result)
-            form_entrepreneur_block(result)
           end
         end
 
@@ -100,18 +99,6 @@ module Cab
           INDIVIDUAL_INFO_KEYS.each do |key|
             result[key] = individual_info[key] if individual_info.key?(key)
           end
-        end
-
-        # Формирует в ассоциативном массиве с информацией об индивидуальном
-        # предпринимателе дополнительный блок информации
-        # @param [Hash] result
-        #   ассоциативный массив с информацией об индивидуальном
-        #   предпринимателе
-        def form_entrepreneur_block(result)
-          result[:entrepreneur] = {
-            commercial_name: result.delete(:commercial_name),
-            ogrn:            result.delete(:ogrn)
-          }
         end
       end
     end

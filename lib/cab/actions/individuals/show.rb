@@ -19,7 +19,7 @@ module Cab
             expand_json(result, :residential_address)
             next unless extended?
             agreement = result.delete(:agreement)
-            result[:consent_to_processing] = [content: agreement.to_s]
+            result[:consent_to_processing] = { content: agreement.to_s }
             result[:identity_documents] = identity_documents
           end
         end
@@ -91,25 +91,13 @@ module Cab
         # @return [Array]
         #   результирующий список
         def identity_documents
-          identity_documents_dataset.map do |hash|
-            hash.tap do
-              content = hash.delete(:content)
-              hash[:files] = [content: content.to_s]
-            end
-          end
-        end
-
-        # Возвращает запрос Sequel на извлечение записей документов,
-        # удостоверяющих личность
-        # @return [Sequel::Dataset]
-        #   результирующий запрос Sequel
-        def identity_documents_dataset
           Models::IdentityDocument
             .naked
             .select(*DOC_FIELDS)
             .where(individual_id: id)
             .order_by(:type, :created_at)
             .distinct(:type)
+            .to_a
         end
 
         # Заменяет значение по данному ключу ассоциативного массива структурой,

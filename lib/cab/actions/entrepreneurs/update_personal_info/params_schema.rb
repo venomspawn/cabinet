@@ -67,20 +67,8 @@ module Cab
                 due_date: {
                   type: %i[string null]
                 },
-                files: {
-                  type: :array,
-                  items: {
-                    type: :object,
-                    properties: {
-                      content: {
-                        type: :string
-                      }
-                    },
-                    required: %i[
-                      content
-                    ]
-                  },
-                  minItems: 1
+                content: {
+                  type: :string
                 }
               },
               required: %i[
@@ -88,7 +76,7 @@ module Cab
                 series
                 issued_by
                 issue_date
-                files
+                content
               ]
             }
           },

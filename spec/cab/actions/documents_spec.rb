@@ -10,20 +10,12 @@ RSpec.describe Cab::Actions::Documents do
   end
 
   describe '.update' do
-    include described_class::Update::SpecHelper
-
     subject(:result) { described_class.update(id, params) }
 
     let(:id) { document.id }
     let(:document) { create(:identity_document) }
     let(:params) { create('params/actions/documents/update', traits) }
     let(:traits) { {} }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to match_json_schema(schema) }
-    end
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { document.reload.created_at }
@@ -32,7 +24,7 @@ RSpec.describe Cab::Actions::Documents do
     it 'should update content of the document' do
       subject
       document.reload
-      expect(document.content).to be == params.first[:content]
+      expect(document.content).to be == params[:content]
     end
 
     context 'when there is `id` property in params' do
@@ -44,7 +36,7 @@ RSpec.describe Cab::Actions::Documents do
     end
 
     context 'when there is additional property in params' do
-      let(:params) { [content: document.content, additional: :property] }
+      let(:traits) { { content: document.content, additional: :property } }
 
       it 'should ignore it' do
         expect { subject }.not_to change { document.reload.values }
@@ -53,9 +45,9 @@ RSpec.describe Cab::Actions::Documents do
 
     context 'when params is of String type' do
       context 'when params is a JSON-string' do
-        context 'when params represents a list' do
-          context 'when the list is of wrong structure' do
-            let(:params) { Oj.dump(%i[of wrong structure]) }
+        context 'when params represents a map' do
+          context 'when the map is of wrong structure' do
+            let(:params) { Oj.dump(wrong: :structure) }
 
             it 'should raise JSON::Schema::ValidationError' do
               expect { subject }.to raise_error(JSON::Schema::ValidationError)
@@ -63,8 +55,8 @@ RSpec.describe Cab::Actions::Documents do
           end
         end
 
-        context 'when params does not represent a list' do
-          let(:params) { Oj.dump(not: { a: :list}) }
+        context 'when params does not represent a map' do
+          let(:params) { Oj.dump(%i[not a map]) }
 
           it 'should raise JSON::Schema::ValidationError' do
             expect { subject }.to raise_error(JSON::Schema::ValidationError)
@@ -81,9 +73,9 @@ RSpec.describe Cab::Actions::Documents do
       end
     end
 
-    context 'when params is of Array type' do
+    context 'when params is of Hash type' do
       context 'when params is of wrong structure' do
-        let(:params) { %i[of wrong structure] }
+        let(:params) { { wrong: :structure } }
 
         it 'should raise JSON::Schema::ValidationError' do
           expect { subject }.to raise_error(JSON::Schema::ValidationError)
@@ -91,8 +83,8 @@ RSpec.describe Cab::Actions::Documents do
       end
     end
 
-    context 'when params is not of Array type nor of String type' do
-      let(:params) { { wrong: :type } }
+    context 'when params is not of Hash type nor of String type' do
+      let(:params) { %w[not of Hash type nor of String type] }
 
       it 'should raise JSON::Schema::ValidationError' do
         expect { subject }.to raise_error(JSON::Schema::ValidationError)

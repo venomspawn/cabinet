@@ -4,8 +4,6 @@
 
 RSpec.describe Cab::API::REST::Organizations::Update do
   describe 'PUT /organizations/:id' do
-    include described_class::SpecHelper
-
     subject { put "/organizations/#{id}", request_body }
 
     let(:request_body) { Oj.dump(params) }
@@ -13,9 +11,7 @@ RSpec.describe Cab::API::REST::Organizations::Update do
     let(:record) { create(:organization) }
     let(:params) { create('params/actions/organizations/update') }
 
-    it { is_expected.to be_ok }
-
-    it { is_expected.to have_proper_body(schema) }
+    it { is_expected.to be_no_content }
 
     it 'should call `update` function of Cab::Actions::Organizations' do
       expect(Cab::Actions::Organizations).to receive(:update)

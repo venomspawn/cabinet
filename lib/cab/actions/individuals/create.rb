@@ -16,13 +16,12 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def create
-          load_spokesman
           Sequel::Model.db.transaction(savepoint: true) do
             record = create_individual
-            create_identity_document(record)
+            document = create_identity_document(record)
             vicarious_authority = create_vicarious_authority
             create_individual_spokesman(record, vicarious_authority)
-            values(record)
+            { id: record.id, identity_document_id: document.id }
           end
         end
 
@@ -35,53 +34,46 @@ module Cab
         # @return [NilClass]
         #   если запись физического лица создаётся без указания записи
         #   представителя
-        attr_reader :spokesman
-
-        # Загружает запись представителя, если запись физического лица
-        # создаётся с его указанием
         # @raise [Sequel::NoMatchingRow]
         #   если запись представителя не найдена
-        def load_spokesman
-          @spokesman = params[:spokesman]&.[](:id)
-          @spokesman &&= Models::Individual.select(:id).with_pk!(@spokesman)
+        def spokesman
+          return if params[:spokesman].nil?
+          @spokesman ||=
+            Models::Individual.select(:id).with_pk!(params[:spokesman][:id])
         end
 
         # Создаёт и возвращает запись физического лица
         # @return [Cab::Models::Individual]
         #   созданная запись физического лица
         def create_individual
-          Models::Individual.unrestrict_primary_key
-          Models::Individual.create(individual_params).tap do
-            Models::Individual.restrict_primary_key
-          end
+          create_unrestricted(:Individual, individual_params)
         end
 
-        # Список названий полей записи физического лица, значения которых
-        # извлекаются из параметров действия
-        INDIVIDUAL_FIELDS = %i[
-          middle_name
-          birth_place
-          sex
-          citizenship
-          snils
-          inn
-          registration_address
-        ].freeze
+        # Ассоциативный массив, отображающий названия ключей ассоциативного
+        # массива атрибутов записи физического лица в названия ключей
+        # ассоциативного массива параметров
+        INDIVIDUAL_FIELDS = {
+          id:                   SecureRandom.method(:uuid),
+          name:                 :first_name,
+          surname:              :last_name,
+          middle_name:          :middle_name,
+          birth_place:          :birth_place,
+          birthday:             :birth_date,
+          sex:                  :sex,
+          citizenship:          :citizenship,
+          snils:                :snils,
+          inn:                  :inn,
+          registration_address: :registration_address,
+          residence_address:    :residential_address,
+          agreement:            %i[consent_to_processing content],
+          created_at:           Time.method(:now)
+        }.freeze
 
         # Возвращает ассоциативный массив полей записи физического лица
         # @return [Hash]
         #   результирующий ассоциативный массив
         def individual_params
-          params.slice(*INDIVIDUAL_FIELDS).tap do |hash|
-            hash[:id]                = SecureRandom.uuid
-            hash[:name]              = params[:first_name]
-            hash[:surname]           = params[:last_name]
-            hash[:birthday]          = params[:birth_date]
-            hash[:residence_address] = params[:residential_address]
-            hash[:created_at]        = Time.now
-
-            hash[:agreement] = params[:consent_to_processing].first[:content]
-          end
+          extract_params(INDIVIDUAL_FIELDS)
         end
 
         # Создаёт запись документа, удостоверяющего личность физического лица
@@ -89,15 +81,24 @@ module Cab
         #   запись физического лица
         def create_identity_document(record)
           document_params = identity_document_params(record)
-          Models::IdentityDocument.unrestrict_primary_key
-          Models::IdentityDocument.create(document_params)
-          Models::IdentityDocument.restrict_primary_key
+          create_unrestricted(:IdentityDocument, document_params)
         end
 
-        # Список названий полей записи документа, удостоверяющего личность,
-        # значения которых извлекаются из параметров действия
-        IDENTITY_DOCUMENT_FIELDS =
-          %i[type number series issued_by issue_date].freeze
+        # Ассоциативный массив, в котором сопоставляются названия полей записи
+        # документа, удостоверяющего личность, и способы извлечения значений
+        # этих полей из параметров действия
+        IDENTITY_DOCUMENT_FIELDS = {
+          id:             SecureRandom.method(:uuid),
+          type:           %i[identity_document type],
+          name:           %i[identity_document title],
+          number:         %i[identity_document number],
+          series:         %i[identity_document series],
+          issued_by:      %i[identity_document issued_by],
+          issue_date:     %i[identity_document issue_date],
+          expiration_end: %i[identity_document due_date],
+          content:        %i[identity_document content],
+          created_at:     Time.method(:now)
+        }.freeze
 
         # Возвращает ассоциативный массив полей записи документа,
         # удостоверяющего личность
@@ -106,13 +107,8 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def identity_document_params(record)
-          param = params[:identity_document]
-          param.slice(*IDENTITY_DOCUMENT_FIELDS).tap do |hash|
-            hash[:id]             = SecureRandom.uuid
-            hash[:expiration_end] = param[:due_date]
-            hash[:content]        = param[:files].first[:content]
-            hash[:created_at]     = Time.now
-            hash[:individual_id]  = record.id
+          extract_params(IDENTITY_DOCUMENT_FIELDS).tap do |hash|
+            hash[:individual_id] = record.id
           end
         end
 
@@ -126,31 +122,31 @@ module Cab
         #   представителя
         def create_vicarious_authority
           return if spokesman.nil?
-          document_params = vicarious_authority_params
-          Models::VicariousAuthority.unrestrict_primary_key
-          Models::VicariousAuthority.create(document_params).tap do
-            Models::VicariousAuthority.restrict_primary_key
-          end
+          create_unrestricted(:VicariousAuthority, vicarious_authority_params)
         end
 
-        # Список названий полей записи документа, подтверждающего полномочия
-        # представителя, значения которых извлекаются из параметров действия
-        VICARIOUS_AUTHORITY_FIELDS =
-          %i[number series registry_number issued_by issue_date].freeze
+        # Ассоциативный массив, в котором сопоставляются названия полей записи
+        # документа, подтверждающего полномочия представителя, и способы
+        # извлечения значений этих полей из параметров действия
+        VICARIOUS_AUTHORITY_FIELDS = {
+          id:              SecureRandom.method(:uuid),
+          name:            %i[spokesman title],
+          number:          %i[spokesman number],
+          series:          %i[spokesman series],
+          registry_number: %i[spokesman registry_number],
+          issued_by:       %i[spokesman issued_by],
+          issue_date:      %i[spokesman issue_date],
+          expiration_date: %i[spokesman due_date],
+          content:         %i[spokesman content],
+          created_at:      Time.method(:now)
+        }.freeze
 
         # Возвращает ассоциативный массив полей записи документа,
         # подтверждающего полномочия представителя
         # @return [Hash]
         #   результирующий ассоциативный массив
         def vicarious_authority_params
-          param = params[:spokesman][:power_of_attorney]
-          param.slice(*VICARIOUS_AUTHORITY_FIELDS).tap do |hash|
-            hash[:id]              = SecureRandom.uuid
-            hash[:name]            = param[:title]
-            hash[:expiration_date] = param[:due_date]
-            hash[:content]         = param[:files].first[:content]
-            hash[:created_at]      = Time.now
-          end
+          extract_params(VICARIOUS_AUTHORITY_FIELDS)
         end
 
         # Создаёт запись связи между записями физического лица и его
@@ -166,9 +162,7 @@ module Cab
           return if vicarious_authority.nil?
           link_params =
             individual_spokesman_params(record, vicarious_authority)
-          Models::IndividualSpokesman.unrestrict_primary_key
-          Models::IndividualSpokesman.create(link_params)
-          Models::IndividualSpokesman.restrict_primary_key
+          create_unrestricted(:IndividualSpokesman, link_params)
         end
 
         # Возвращает ассоциативный массив полей записи связи между записями
@@ -186,36 +180,6 @@ module Cab
             individual_id:          record.id,
             vicarious_authority_id: vicarious_authority.id
           }
-        end
-
-        # Названия полей ассоциативного массива атрибутов записи физического
-        # лица, копируемых из параметров действия
-        VALUES_FIELDS = %i[
-          first_name
-          last_name
-          birth_place
-          birth_date
-          sex
-          citizenship
-          residential_address
-          consent_to_processing
-        ]
-
-        # Возвращает ассоциативный массив атрибутов записи физического лица
-        # @param [Cab::Models::Individual] record
-        #   запись физического лица
-        # @return [Hash]
-        #   результирующий ассоциативный массив
-        def values(record)
-          params.slice(*VALUES_FIELDS).tap do |hash|
-            hash[:client_type]          = 'individual'
-            hash[:id]                   = record.id
-            hash[:middle_name]          = params[:middle_name]
-            hash[:inn]                  = params[:inn]
-            hash[:snils]                = params[:snils]
-            hash[:registration_address] = params[:registration_address]
-            hash[:identity_documents]   = [params[:identity_document]]
-          end
         end
       end
     end
