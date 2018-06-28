@@ -15,7 +15,6 @@ module Cab
         def show
           values.tap do |result|
             result[:client_type] = :organization
-            form_director(result)
             expand_json(result, :legal_address)
             expand_json(result, :actual_address)
             expand_json(result, :bank_details)
@@ -62,23 +61,6 @@ module Cab
         #   если запись юридического лица не найдена
         def values
           Models::Organization.naked.select(*FIELDS).where(id: id).first!
-        end
-
-        # Названия ключей ассоциативного массива с информацией о юридическом
-        # лице, из значений которых формируется значение поля с полным именем
-        # руководителя юридического лица
-        DIRECTOR_PARTS = %i[chief_surname chief_name chief_middle_name]
-
-        # Удаляет из ассоциативного массива с информацией о юридическом лице ш
-        # ключи частями полного имени руководителя юридического лица и
-        # добавляет в него новое поле с полным именем руководителя юридического
-        # лица
-        # @param [Hash] result
-        #   ассоциативный массив с информацией о юридическом лице
-        def form_director(result)
-          parts =
-            DIRECTOR_PARTS.map(&result.method(:delete)).find_all(&:present?)
-          result[:director] = parts.join(' ')
         end
 
         # Заменяет значение по данному ключу ассоциативного массива структурой,

@@ -21,8 +21,14 @@ module Cab
             sokr_name: {
               type: %i[null string]
             },
-            director: {
+            chief_name: {
               type: :string
+            },
+            chief_surname: {
+              type: :string
+            },
+            chief_middle_name: {
+              type: %i[null string]
             },
             registration_date: {
               type: :string
@@ -49,7 +55,9 @@ module Cab
             id
             full_name
             sokr_name
-            director
+            chief_name
+            chief_surname
+            chief_middle_name
             registration_date
             inn
             kpp
