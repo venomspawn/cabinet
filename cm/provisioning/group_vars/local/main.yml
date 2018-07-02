@@ -1,6 +1,7 @@
 ---
 apt_packages:
   - libpq-dev
+  - libmysqlclient-dev
   - mc
   - vim
   - ruby2.4-dev

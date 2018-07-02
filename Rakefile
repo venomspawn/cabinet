@@ -14,4 +14,14 @@ namespace :cab do
     db = Sequel::Model.db
     Cab::Tasks::Migration.new(db, to, from, dir).launch!
   end
+
+  desc 'Переносит данные из старого сервиса'
+  task :transfer do
+    require_relative 'config/app_init'
+
+    Cab::Init.run!(only: %w[class_ext oj sequel models])
+    Cab.need 'tasks/transfer'
+
+    Cab::Tasks::Transfer.launch!
+  end
 end
