@@ -28,6 +28,12 @@ module Cab
         #   ассоциативный массив с информацией о документах
         attr_reader :ecm_documents
 
+        # Ассоциативный массив, в котором идентификаторам папок заявителей
+        # сопоставлены списки идентификаторов записей заявителей
+        # @return [Hash]
+        #   ассоциативный массив с информацией о папках заявителей
+        attr_reader :ecm_private_folders
+
         # Ассоциативный массив, в котором идентификаторам записей заявителей
         # сопоставлены ассоциативные массивы с информацией об адресах их
         # регистрации
@@ -74,6 +80,7 @@ module Cab
           initialize_ecm_people
           initialize_ecm_organizations
           initialize_ecm_documents
+          initialize_ecm_private_folders
           initialize_ecm_addresses
           initialize_ecm_factual_addresses
           initialize_vicarious_authorities
@@ -112,6 +119,16 @@ module Cab
         # Инициализирует коллекцию данных о документах
         def initialize_ecm_documents
           @ecm_documents = ECMDocuments.data(db)
+        end
+
+        # Инициализирует коллекцию данных о папках заявителей
+        def initialize_ecm_private_folders
+          @ecm_private_folders =
+            ecm_people.each_with_object({}) do |(person_id, person), memo|
+              private_folder_id = person[:private_folder_id]
+              memo[private_folder_id] ||= []
+              memo[private_folder_id] << person_id
+            end
         end
 
         # Инициализирует коллекцию данных об адресах регистрации
