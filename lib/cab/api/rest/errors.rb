@@ -68,7 +68,7 @@ module Cab
         #   код ошибки
         def self.define_error_handler(controller, error_class, error_code)
           controller.error error_class do
-            log_regular_error
+            log_regular_error unless error_code == 404
             status error_code
             content = { error: error_class, message: error.message }
             body Oj.dump(content)
