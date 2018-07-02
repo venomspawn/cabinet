@@ -4,13 +4,19 @@ module Cab
   module Actions
     module Entrepreneurs
       class Show
+        # Выражение для шестнадцатеричной цифры
+        HEX = '[a-zA-Z0-9]'
+
+        # Регулярное выражение для проверки на формат UUID
+        UUID_FORMAT = /^#{HEX}{8}-#{HEX}{4}-#{HEX}{4}-#{HEX}{4}-#{HEX}{12}$/
+
         # JSON-схема параметров действия
         PARAMS_SCHEMA = {
           type: :object,
           properties: {
             id: {
               type: :string,
-              pattern: /^\d{8}-\d{4}-\d{4}-\d{4}-\d{12}$/
+              pattern: UUID_FORMAT
             },
             extended: {
               type: %i[null boolean string]
