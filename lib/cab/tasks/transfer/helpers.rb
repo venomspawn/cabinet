@@ -46,16 +46,38 @@ module Cab
         #   заявителей сопоставлены списки проблем, произошедших при импорте
         #   этих записей
         # @param [String] filepath
-        #   путь до файла с результатами импорта
-        def log_finish(stats, filepath)
+        #   путь до файла с результатами импорта записей
+        # @param [String] va_filepath
+        #   путь до файла с результатами импорта записей
+        def log_finish(stats, filepath, va_filepath)
           imported, failed = stats.each_with_object([0, 0]) do |(_, err), memo|
             err.empty? ? memo[0] += 1 : memo[1] += 1
           end
           log_info { "Импортированы записи в количестве #{imported}" }
           log_info { "Не удалось импортировать записи в количестве #{failed}" }
+          log_csv(filepath)
+          log_va_csv(va_filepath)
+        end
+
+        # Создаёт запись в журнале событий о том, где находится информация об
+        # импорте записей
+        # @param [String] filepath
+        #   путь до файла с результатами импорта записей
+        def log_csv(filepath)
           log_info { <<-MESSAGE }
-            Информация о неудачном импорте записей находится в CSV-файле по
-            пути `#{filepath}`
+            Информация об импорте записей находится в CSV-файле по пути
+            `#{filepath}`
+          MESSAGE
+        end
+
+        # Создаёт запись в журнале событий о том, где находится информация об
+        # импорте связей между заявителями и представителями
+        # @param [String] filepath
+        #   путь до файла с результатами импорта записей связей
+        def log_va_csv(filepath)
+          log_info { <<-MESSAGE }
+            Информация об импорте связей между заявителями и представителями
+            находится в CSV-файле по пути `#{filepath}`
           MESSAGE
         end
       end

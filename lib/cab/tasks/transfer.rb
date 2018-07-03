@@ -8,6 +8,7 @@ require_relative 'transfer/helpers'
 require_relative 'transfer/importers/entrepreneur'
 require_relative 'transfer/importers/individual'
 require_relative 'transfer/importers/organization'
+require_relative 'transfer/importers/vicarious_authority'
 
 module Cab
   module Tasks
@@ -27,21 +28,30 @@ module Cab
         @individual_ids = extract_individual_ids
         @organization_ids = extract_organization_ids
         @stats = {}
+        @va_stats = {}
       end
 
       # Путь до директории со временными файлами
       TMP_DIRPATH = "#{Cab.root}/tmp"
 
-      # Путь до CSV-файла с информацией о неудачном импорте записей
+      # Путь до CSV-файла с информацией об импорте записей
       FAILURES_INFO_FILEPATH =
         "#{TMP_DIRPATH}/#{Time.now.strftime('%Y-%m-%d-%H-%M')}.csv"
 
+      # Путь до CSV-файла с информацией об импорте записей связей между
+      # записями заявителей и представителей
+      VA_FAILURES_INFO_FILEPATH =
+        "#{TMP_DIRPATH}/#{Time.now.strftime('%Y-%m-%d-%H-%M')}.va.csv"
+
       # Запускает перенос данных заявителей из старого сервиса
       def launch!
-        import_individuals
-        import_organizations
-        save_results
-        log_finish(stats, FAILURES_INFO_FILEPATH)
+        #import_individuals
+        #import_organizations
+        import_vicarious_authorities
+        make_temp_dir
+        save_stats_results
+        save_va_stats_results
+        log_finish(stats, FAILURES_INFO_FILEPATH, VA_FAILURES_INFO_FILEPATH)
       end
 
       private
@@ -71,6 +81,16 @@ module Cab
       #   заявителей сопоставлены списки проблем, произошедших при импорте этих
       #   записей
       attr_reader :stats
+
+      # Ассоциативный массив, в котором спискам из идентификаторов записей
+      # заявителей и идентификаторов записей представителей сопоставлены списки
+      # проблем, произошедших при импорте информации о доверенностях
+      # @return [Hash]
+      #   ассоциативный массив, в котором спискам из идентификаторов записей
+      #   заявителей, представителей и документов, удостоверяющих полномочия
+      #   представителей, сопоставлены списки проблем, произошедших при импорте
+      #   информации о доверенностях
+      attr_reader :va_stats
 
       # Возвращает множество идентификаторов имеющихся записей физических лиц
       # @return [Set]
@@ -136,6 +156,28 @@ module Cab
         log_import_organization(ecm_person, ecm_org, result)
       end
 
+      # Импортирует записи связей между заявителями и их представителями
+      def import_vicarious_authorities
+        cabinet
+          .vicarious_authorities
+          .each(&method(:import_vicarious_authority))
+      end
+
+      # Импортирует информацию о доверенности
+      # @param [String] person_id
+      #   идентификатор записи заявителя
+      # @param [String] agent_id
+      #   идентификатор записи представителя
+      # @param [Array<Hash>] doc
+      #   информация о доверенностях
+      def import_vicarious_authority((person_id, agent_id), docs)
+        docs.each do |doc|
+          result =
+            Importers::VicariousAuthority.new(person_id, agent_id, doc).import
+          va_stats[[person_id, agent_id, doc[:id]]] = result
+        end
+      end
+
       # Возвращает тип импортированной записи
       # @param [Hash] ecm_person
       #   ассоциативный массив полей исходной записи заявителя
@@ -151,35 +193,67 @@ module Cab
         `mkdir -p #{TMP_DIRPATH}`
       end
 
-      # Заголовки CSV-файла с информацией о неудачном импорте записей
+      # Заголовки CSV-файла с информацией об импорте записей
       FAILURES_INFO_HEADERS = [
         'Идентификатор',
         'Тип',
         'Дата и время создания',
-        'Причины неудачи'
+        'Статус'
       ].freeze
 
       # Открывает CSV-файл для блока и добавляет в него заголовки
       # @yieldparam [CSV] csv
       #   CSV-файл
-      def open_csv
-        CSV.open(FAILURES_INFO_FILEPATH, 'wb') do |csv|
-          csv << FAILURES_INFO_HEADERS
-          yield csv
+      def open_csv(path, headers)
+        CSV.open(path, 'wb') { |csv| yield csv << headers }
+      end
+
+      # Сообщение о том, что запись заявителя успешно импортирована
+      STATUS_OK = 'запись успешно импортирована'
+
+      # Сохраняет результаты импорта в CSV-файл
+      def save_stats_results
+        open_csv(FAILURES_INFO_FILEPATH, FAILURES_INFO_HEADERS) do |csv|
+          stats.each do |id, status|
+            ecm_person = cabinet.ecm_people[id]
+            status = status.empty? ? STATUS_OK : status.join(', ')
+            created_at = ecm_person[:created_at].strftime('%d.%m.%Y %T')
+            csv << [id, ecm_person_type(ecm_person), created_at, status]
+          end
         end
       end
 
+      # Заголовки CSV-файла с информацией об импорте записей связей между
+      # заявителями и представителями
+      VA_FAILURES_INFO_HEADERS = [
+        'Идентификатор записи заявителя',
+        'Идентификатор записи представителя',
+        'Идентификатор записи документа',
+        'Дата и время создания',
+        'Статус'
+      ].freeze
+
+      # Возвращает список списков с информацией об импорте записей связей между
+      # заявителями и представителями
+      # @return [Array<Array>]
+      #   результирующий список списков
+      def csv_va_rows
+        puts "va_stats = #{va_stats}"
+        rows = va_stats.each_with_object([]) do |(ids, status), memo|
+          created_at = cabinet.ecm_documents[ids.last][:created_at]
+          status = status.empty? ? STATUS_OK : status.join(', ')
+          memo << ids.dup.push(created_at, status)
+        end
+        rows.sort! do |a, b|
+          (a[0] <=> b[0]) * 100 + (a[1] <=> b[1]) * 10 + (a[3] <=> b[3])
+        end
+        rows.each { |row| row[3] = row[3].strftime('%d.%m.%Y %T') }
+      end
+
       # Сохраняет результаты импорта в CSV-файл
-      def save_results
-        make_temp_dir
-        open_csv do |csv|
-          stats.each do |id, err|
-            next if err.empty?
-            ecm_person = cabinet.ecm_people[id]
-            err = err.join(', ')
-            created_at = ecm_person[:created_at].strftime('%d.%m.%Y %T')
-            csv << [id, ecm_person_type(ecm_person), created_at, err]
-          end
+      def save_va_stats_results
+        open_csv(VA_FAILURES_INFO_FILEPATH, VA_FAILURES_INFO_HEADERS) do |csv|
+          csv_va_rows.each(&csv.method(:<<))
         end
       end
     end
