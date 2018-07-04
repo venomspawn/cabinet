@@ -104,7 +104,7 @@ module Cab
           def load_vicarious_authority_fields
             hash = {
               content:    file(doc[:attachment]),
-              created_at: doc[:created_at].strftime('%FT%T'),
+              created_at: doc[:created_at].strftime('%FT%T')
             }
             hash.tap { DOC_PATHS.each { |key, p| hash[key] = doc.dig(*p) } }
           end
@@ -182,7 +182,7 @@ module Cab
             Models::IndividualSpokesman   => :individual_id,
             Models::EntrepreneurSpokesman => :entrepreneur_id,
             Models::OrganizationSpokesman => :organization_id
-          }
+          }.freeze
 
           # Создаёт запись связи между записями заявителя, представителя и
           # документа, подтверждающего полномочия представителя

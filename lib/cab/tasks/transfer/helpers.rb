@@ -17,7 +17,7 @@ module Cab
         #   список проблем, возникших при импорте
         def log_import_individual(ecm_person, result)
           log_info { <<-MESSAGE } if result.empty?
-            Импортирована запись физического лица с идентификатором
+            Импортирована запись физического лица с идентификатором записи
             #{ecm_person[:id]}
           MESSAGE
         end
@@ -33,11 +33,29 @@ module Cab
         def log_import_organization(ecm_person, ecm_org, result)
           log_info { ecm_org[:type] == 'B' ? <<-ENT : <<-ORG } if result.empty?
             Импортирована запись индивидуального предпринимателя с
-            идентификатором #{ecm_person[:id]}
+            идентификатором записи #{ecm_person[:id]}
           ENT
-            Импортирована запись юридического лица с идентификатором
+            Импортирована запись юридического лица с идентификатором записи
             #{ecm_person[:id]}
           ORG
+        end
+
+        # Создаёт запись в журнале событий о том, что импортирована запись
+        # связи между заявителем и представителем
+        # @param [String] person_id
+        #   идентификатор записи заявителя
+        # @param [String] agent_id
+        #   идентификатор записи представителя
+        # @param [String] doc_id
+        #   идентификатор записи документа
+        # @param [Array] result
+        #   список проблем, возникших при импорте
+        def log_import_vicarious_authority(person_id, agent_id, doc_id, result)
+          log_info { <<-MESSAGE } if result.empty?
+            Импортирована запись связи между записями заявителя, представителя
+            и документа, подтверждающего полномочия представителя, с
+            идентификаторами `#{person_id}`, `#{agent_id}`, `#{doc_id}`
+          MESSAGE
         end
 
         # Создаёт запись в журнале событий об окончании импорта

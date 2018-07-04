@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'csv'
 require 'set'
 
 require_relative 'transfer/cabinet'
+require_relative 'transfer/csv'
 require_relative 'transfer/helpers'
 require_relative 'transfer/importers/entrepreneur'
 require_relative 'transfer/importers/individual'
@@ -14,6 +14,7 @@ module Cab
   module Tasks
     # Класс объектов, запускающих перенос данных заявителей из старого сервиса
     class Transfer
+      include CSV
       include Helpers
 
       # Создаёт экземпляр клааса и запускает перенос данных заявителей из
@@ -31,26 +32,14 @@ module Cab
         @va_stats = {}
       end
 
-      # Путь до директории со временными файлами
-      TMP_DIRPATH = "#{Cab.root}/tmp"
-
-      # Путь до CSV-файла с информацией об импорте записей
-      FAILURES_INFO_FILEPATH =
-        "#{TMP_DIRPATH}/#{Time.now.strftime('%Y-%m-%d-%H-%M')}.csv"
-
-      # Путь до CSV-файла с информацией об импорте записей связей между
-      # записями заявителей и представителей
-      VA_FAILURES_INFO_FILEPATH =
-        "#{TMP_DIRPATH}/#{Time.now.strftime('%Y-%m-%d-%H-%M')}.va.csv"
-
       # Запускает перенос данных заявителей из старого сервиса
       def launch!
-        #import_individuals
-        #import_organizations
+        import_individuals
+        import_organizations
         import_vicarious_authorities
         make_temp_dir
-        save_stats_results
-        save_va_stats_results
+        save_stats_results(stats)
+        save_va_stats_results(va_stats)
         log_finish(stats, FAILURES_INFO_FILEPATH, VA_FAILURES_INFO_FILEPATH)
       end
 
@@ -174,7 +163,8 @@ module Cab
         docs.each do |doc|
           result =
             Importers::VicariousAuthority.new(person_id, agent_id, doc).import
-          va_stats[[person_id, agent_id, doc[:id]]] = result
+          va_stats[[person_id, agent_id, doc[:id], doc[:created_at]]] = result
+          log_import_vicarious_authority(person_id, agent_id, doc[:id], result)
         end
       end
 
@@ -186,75 +176,6 @@ module Cab
         return 'ФЛ' if ecm_org_id.nil?
         ecm_org = cabinet.ecm_organizations[ecm_org_id]
         ecm_org[:type] == 'B' ? 'ИП' : 'ЮЛ'
-      end
-
-      # Создаёт директорию {TMP_DIRPATH}
-      def make_temp_dir
-        `mkdir -p #{TMP_DIRPATH}`
-      end
-
-      # Заголовки CSV-файла с информацией об импорте записей
-      FAILURES_INFO_HEADERS = [
-        'Идентификатор',
-        'Тип',
-        'Дата и время создания',
-        'Статус'
-      ].freeze
-
-      # Открывает CSV-файл для блока и добавляет в него заголовки
-      # @yieldparam [CSV] csv
-      #   CSV-файл
-      def open_csv(path, headers)
-        CSV.open(path, 'wb') { |csv| yield csv << headers }
-      end
-
-      # Сообщение о том, что запись заявителя успешно импортирована
-      STATUS_OK = 'запись успешно импортирована'
-
-      # Сохраняет результаты импорта в CSV-файл
-      def save_stats_results
-        open_csv(FAILURES_INFO_FILEPATH, FAILURES_INFO_HEADERS) do |csv|
-          stats.each do |id, status|
-            ecm_person = cabinet.ecm_people[id]
-            status = status.empty? ? STATUS_OK : status.join(', ')
-            created_at = ecm_person[:created_at].strftime('%d.%m.%Y %T')
-            csv << [id, ecm_person_type(ecm_person), created_at, status]
-          end
-        end
-      end
-
-      # Заголовки CSV-файла с информацией об импорте записей связей между
-      # заявителями и представителями
-      VA_FAILURES_INFO_HEADERS = [
-        'Идентификатор записи заявителя',
-        'Идентификатор записи представителя',
-        'Идентификатор записи документа',
-        'Дата и время создания',
-        'Статус'
-      ].freeze
-
-      # Возвращает список списков с информацией об импорте записей связей между
-      # заявителями и представителями
-      # @return [Array<Array>]
-      #   результирующий список списков
-      def csv_va_rows
-        puts "va_stats = #{va_stats}"
-        rows = va_stats.each_with_object([]) do |(ids, status), memo|
-          created_at = cabinet.ecm_documents[ids.last][:created_at]
-          status = status.empty? ? STATUS_OK : status.join(', ')
-          memo << ids.dup.push(created_at, status)
-        end
-        rows.sort! do |a, b|
-          (a[0] <=> b[0]) * 100 + (a[1] <=> b[1]) * 10 + (a[3] <=> b[3])
-        end
-        rows.each { |row| row[3] = row[3].strftime('%d.%m.%Y %T') }
-      end
-
-      # Сохраняет результаты импорта в CSV-файл
-      def save_va_stats_results
-        open_csv(VA_FAILURES_INFO_FILEPATH, VA_FAILURES_INFO_HEADERS) do |csv|
-          csv_va_rows.each(&csv.method(:<<))
-        end
       end
     end
   end
