@@ -45,7 +45,7 @@ module Cab
 
           # Возвращает ассоциативный массив, в котором спискам из
           # идентификаторов записей заявителя и представителя соответствует
-          # ассоциативный массив с информацией о последней доверенности
+          # ассоциативный массив с информацией о доверенностях
           # @return [Hash]
           #   ассоциативный массив с информацией о доверенностях
           def data
@@ -112,17 +112,14 @@ module Cab
           # @param [String] spokesman_id
           #   идентификатор записи представителя
           # @param [String] doc_id
-          #   идентификтаор записи доверенности
+          #   идентификатор записи доверенности
           # @param [Hash] memo
           #   ассоциативный массив с информацией о доверенностях
           def process_documents(person_id, spokesman_id, doc_id, memo)
             person_documents(person_id).each do |doc|
               next unless doc[:id] == doc_id
-              key = [person_id, spokesman_id]
-              current = memo[key]
-              created_at = doc[:created_at]
-              next unless current.nil? || current[:created_at] < created_at
-              memo[key] = doc
+              memo[[person_id, spokesman_id]] ||= []
+              memo[[person_id, spokesman_id]] << doc
             end
           end
         end

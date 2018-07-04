@@ -1,18 +1,20 @@
 # frozen_string_literal: true
 
-require 'csv'
 require 'set'
 
 require_relative 'transfer/cabinet'
+require_relative 'transfer/csv'
 require_relative 'transfer/helpers'
 require_relative 'transfer/importers/entrepreneur'
 require_relative 'transfer/importers/individual'
 require_relative 'transfer/importers/organization'
+require_relative 'transfer/importers/vicarious_authority'
 
 module Cab
   module Tasks
     # Класс объектов, запускающих перенос данных заявителей из старого сервиса
     class Transfer
+      include CSV
       include Helpers
 
       # Создаёт экземпляр клааса и запускает перенос данных заявителей из
@@ -27,21 +29,18 @@ module Cab
         @individual_ids = extract_individual_ids
         @organization_ids = extract_organization_ids
         @stats = {}
+        @va_stats = {}
       end
-
-      # Путь до директории со временными файлами
-      TMP_DIRPATH = "#{Cab.root}/tmp"
-
-      # Путь до CSV-файла с информацией о неудачном импорте записей
-      FAILURES_INFO_FILEPATH =
-        "#{TMP_DIRPATH}/#{Time.now.strftime('%Y-%m-%d-%H-%M')}.csv"
 
       # Запускает перенос данных заявителей из старого сервиса
       def launch!
         import_individuals
         import_organizations
-        save_results
-        log_finish(stats, FAILURES_INFO_FILEPATH)
+        import_vicarious_authorities
+        make_temp_dir
+        save_stats_results(stats)
+        save_va_stats_results(va_stats)
+        log_finish(stats, FAILURES_INFO_FILEPATH, VA_FAILURES_INFO_FILEPATH)
       end
 
       private
@@ -71,6 +70,16 @@ module Cab
       #   заявителей сопоставлены списки проблем, произошедших при импорте этих
       #   записей
       attr_reader :stats
+
+      # Ассоциативный массив, в котором спискам из идентификаторов записей
+      # заявителей и идентификаторов записей представителей сопоставлены списки
+      # проблем, произошедших при импорте информации о доверенностях
+      # @return [Hash]
+      #   ассоциативный массив, в котором спискам из идентификаторов записей
+      #   заявителей, представителей и документов, удостоверяющих полномочия
+      #   представителей, сопоставлены списки проблем, произошедших при импорте
+      #   информации о доверенностях
+      attr_reader :va_stats
 
       # Возвращает множество идентификаторов имеющихся записей физических лиц
       # @return [Set]
@@ -136,6 +145,29 @@ module Cab
         log_import_organization(ecm_person, ecm_org, result)
       end
 
+      # Импортирует записи связей между заявителями и их представителями
+      def import_vicarious_authorities
+        cabinet
+          .vicarious_authorities
+          .each(&method(:import_vicarious_authority))
+      end
+
+      # Импортирует информацию о доверенности
+      # @param [String] person_id
+      #   идентификатор записи заявителя
+      # @param [String] agent_id
+      #   идентификатор записи представителя
+      # @param [Array<Hash>] doc
+      #   информация о доверенностях
+      def import_vicarious_authority((person_id, agent_id), docs)
+        docs.each do |doc|
+          result =
+            Importers::VicariousAuthority.new(person_id, agent_id, doc).import
+          va_stats[[person_id, agent_id, doc[:id], doc[:created_at]]] = result
+          log_import_vicarious_authority(person_id, agent_id, doc[:id], result)
+        end
+      end
+
       # Возвращает тип импортированной записи
       # @param [Hash] ecm_person
       #   ассоциативный массив полей исходной записи заявителя
@@ -144,43 +176,6 @@ module Cab
         return 'ФЛ' if ecm_org_id.nil?
         ecm_org = cabinet.ecm_organizations[ecm_org_id]
         ecm_org[:type] == 'B' ? 'ИП' : 'ЮЛ'
-      end
-
-      # Создаёт директорию {TMP_DIRPATH}
-      def make_temp_dir
-        `mkdir -p #{TMP_DIRPATH}`
-      end
-
-      # Заголовки CSV-файла с информацией о неудачном импорте записей
-      FAILURES_INFO_HEADERS = [
-        'Идентификатор',
-        'Тип',
-        'Дата и время создания',
-        'Причины неудачи'
-      ].freeze
-
-      # Открывает CSV-файл для блока и добавляет в него заголовки
-      # @yieldparam [CSV] csv
-      #   CSV-файл
-      def open_csv
-        CSV.open(FAILURES_INFO_FILEPATH, 'wb') do |csv|
-          csv << FAILURES_INFO_HEADERS
-          yield csv
-        end
-      end
-
-      # Сохраняет результаты импорта в CSV-файл
-      def save_results
-        make_temp_dir
-        open_csv do |csv|
-          stats.each do |id, err|
-            next if err.empty?
-            ecm_person = cabinet.ecm_people[id]
-            err = err.join(', ')
-            created_at = ecm_person[:created_at].strftime('%d.%m.%Y %T')
-            csv << [id, ecm_person_type(ecm_person), created_at, err]
-          end
-        end
       end
     end
   end
