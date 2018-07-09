@@ -46,7 +46,8 @@ module Cab
                   type: %i[string null]
                 },
                 ogrn: {
-                  type: :string
+                  type: :string,
+                  pattern: /^[0-9]{15}$/
                 },
                 registration_address: {
                   type: :object,
