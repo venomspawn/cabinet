@@ -10,18 +10,18 @@ module Cab
           properties: {
             snils: {
               type: %i[string null],
-              pattern: /^[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}$/
+              pattern: /\A[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}\z/
             },
             inn: {
               type: %i[string null],
-              pattern: /^[0-9]{12}$/
+              pattern: /\A[0-9]{12}\z/
             },
             commercial_name: {
               type: %i[string null]
             },
             ogrn: {
               type: :string,
-              pattern: /^[0-9]{15}$/
+              pattern: /\A[0-9]{15}\z/
             },
             registration_address: {
               type: :object,

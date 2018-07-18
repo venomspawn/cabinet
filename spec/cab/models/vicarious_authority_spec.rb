@@ -202,7 +202,7 @@ RSpec.describe Cab::Models::VicariousAuthority do
       it 'should be an UUID' do
         hex = '[0-9a-fA-F]'
         expect(subject)
-          .to match(/^#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}$/)
+          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
       end
     end
   end

@@ -273,7 +273,7 @@ RSpec.describe Cab::Models::Individual do
       it 'should be an UUID' do
         hex = '[0-9a-fA-F]'
         expect(subject)
-          .to match(/^#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}$/)
+          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
       end
     end
   end
@@ -418,7 +418,7 @@ RSpec.describe Cab::Models::Individual do
         it { is_expected.to be_a(String) }
 
         it 'should satisfy the format' do
-          expect(subject).to match(/^\d{3}-\d{3}-\d{3} \d{2}$/)
+          expect(subject).to match(/\A\d{3}-\d{3}-\d{3} \d{2}\z/)
         end
       end
     end
@@ -442,7 +442,7 @@ RSpec.describe Cab::Models::Individual do
         it { is_expected.to be_a(String) }
 
         it 'should satisfy the format' do
-          expect(subject).to match(/^\d{12}$/)
+          expect(subject).to match(/\A\d{12}\z/)
         end
       end
     end

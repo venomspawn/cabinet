@@ -12,7 +12,7 @@ Sequel.migration do
       column :actual_address,  :jsonb, null: false
       column :created_at,      :timestamp, null: false
 
-      constraint :entrepreneurs_ogrn_format, :ogrn.like(/^[0-9]{15}$/)
+      constraint :entrepreneurs_ogrn_format, :ogrn.like(/\A[0-9]{15}\Z/)
 
       foreign_key :individual_id, :individuals,
                   type:      :uuid,

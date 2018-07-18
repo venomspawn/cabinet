@@ -25,19 +25,19 @@ module Cab
             },
             registration_date: {
               type: :string,
-              pattern: /^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}$/
+              pattern: /\A[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}\z/
             },
             inn: {
               type: :string,
-              pattern: /^[0-9]{10}$/
+              pattern: /\A[0-9]{10}\z/
             },
             kpp: {
               type: :string,
-              pattern: /^[0-9]{9}$/
+              pattern: /\A[0-9]{9}\z/
             },
             ogrn: {
               type: :string,
-              pattern: /^[0-9]{13}$/
+              pattern: /\A[0-9]{13}\z/
             },
             legal_address: {
               type: :object,

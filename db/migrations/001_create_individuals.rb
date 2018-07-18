@@ -45,9 +45,9 @@ Sequel.migration do
             opclass: :gist_trgm_ops
 
       constraint :individuals_snils_format,
-                 :snils.like(/^[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}$/)
+                 :snils.like(/\A[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}\Z/)
 
-      constraint :individuals_inn_format, :inn.like(/^[0-9]{12}$/)
+      constraint :individuals_inn_format, :inn.like(/\A[0-9]{12}\Z/)
     end
   end
 end

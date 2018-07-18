@@ -178,7 +178,7 @@ RSpec.describe Cab::Models::EntrepreneurSpokesman do
       it 'should be an UUID' do
         hex = '[0-9a-fA-F]'
         expect(subject)
-          .to match(/^#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}$/)
+          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
       end
 
       let(:individual) { Cab::Models::Individual.where(id: subject).first }
@@ -202,7 +202,7 @@ RSpec.describe Cab::Models::EntrepreneurSpokesman do
       it 'should be an UUID' do
         hex = '[0-9a-fA-F]'
         expect(subject)
-          .to match(/^#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}$/)
+          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
       end
 
       let(:entrepreneur) { Cab::Models::Entrepreneur.where(id: subject).first }
@@ -226,7 +226,7 @@ RSpec.describe Cab::Models::EntrepreneurSpokesman do
       it 'should be an UUID' do
         hex = '[0-9a-fA-F]'
         expect(subject)
-          .to match(/^#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}$/)
+          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
       end
 
       let(:model) { Cab::Models::VicariousAuthority }

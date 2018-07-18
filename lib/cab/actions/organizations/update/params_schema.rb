@@ -25,7 +25,7 @@ module Cab
             },
             registration_date: {
               type: :string,
-              pattern: /^[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}$/
+              pattern: /\A[0-9]{1,2}.[0-9]{1,2}.[0-9]{4}\z/
             },
             inn: {
               type: :string
