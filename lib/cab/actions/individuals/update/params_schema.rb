@@ -10,11 +10,11 @@ module Cab
           properties: {
             snils: {
               type: %i[string null],
-              pattern: /^[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}$/
+              pattern: /\A[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}\z/
             },
             inn: {
               type: %i[string null],
-              pattern: /^[0-9]{12}$/
+              pattern: /\A[0-9]{12}\z/
             },
             registration_address: {
               type: %i[object null],
