@@ -11,18 +11,18 @@ FactoryBot.define do
     ogrn            { create(:string, length: 15) }
 
     trait :with_individual do
-      first_name            { create(:string) }
-      last_name             { create(:string) }
-      middle_name           { create(:string) }
-      birth_place           { create(:string) }
-      birth_date            { create(:date).strftime('%d.%m.%Y') }
-      sex                   { create(:enum, values: %w[male female]) }
-      citizenship           { create(:enum, values: %w[russian foreign]) }
-      snils                 { create(:snils) }
-      inn                   { create(:string, length: 12) }
-      registration_address  { create(:address) }
-      identity_document     { create('params/identity_document') }
-      consent_to_processing { { content: create(:string) } }
+      first_name           { create(:string) }
+      last_name            { create(:string) }
+      middle_name          { create(:string) }
+      birth_place          { create(:string) }
+      birth_date           { create(:date).strftime('%d.%m.%Y') }
+      sex                  { create(:enum, values: %w[male female]) }
+      citizenship          { create(:enum, values: %w[russian foreign]) }
+      snils                { create(:snils) }
+      inn                  { create(:string, length: 12) }
+      registration_address { create(:address) }
+      identity_document    { create('params/identity_document') }
+      agreement_id         { create(:file).id }
     end
 
     trait :with_individual_id do

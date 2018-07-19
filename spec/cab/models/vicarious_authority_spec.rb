@@ -137,15 +137,6 @@ RSpec.describe Cab::Models::VicariousAuthority do
         end
       end
 
-      context 'when value of `content` property is nil' do
-        let(:params) { attributes_for(:vicarious_authority, content: value) }
-        let(:value) { nil }
-
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
-        end
-      end
-
       context 'when value of `created_at` property is nil' do
         let(:params) { attributes_for(:vicarious_authority, traits) }
         let(:traits) { { created_at: value } }
@@ -167,6 +158,37 @@ RSpec.describe Cab::Models::VicariousAuthority do
           end
         end
       end
+
+      context 'when value of `file_id` property is nil' do
+        let(:params) { attributes_for(:vicarious_authority, traits) }
+        let(:traits) { { file_id: value } }
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+
+      context 'when value of `file_id` property repeats' do
+        let(:params) { attributes_for(:vicarious_authority, file_id: value) }
+        let(:value) { other_vicarious_authority.file_id }
+        let(:other_vicarious_authority) { create(:vicarious_authority) }
+
+        it 'should raise Sequel::UniqueConstraintViolation' do
+          expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
+        end
+      end
+
+      context 'when value of `file_id` is not a primary key' do
+        let(:params) { attributes_for(:vicarious_authority, traits) }
+        let(:traits) { { file_id: value } }
+        let(:value) { create(:uuid) }
+
+        it 'should raise Sequel::ForeignKeyConstraintViolation' do
+          expect { subject }
+            .to raise_error(Sequel::ForeignKeyConstraintViolation)
+        end
+      end
     end
   end
 
@@ -183,6 +205,7 @@ RSpec.describe Cab::Models::VicariousAuthority do
       issue_date
       expiration_date
       created_at
+      file_id
       update
     ]
 
@@ -198,12 +221,7 @@ RSpec.describe Cab::Models::VicariousAuthority do
       subject { result }
 
       it { is_expected.to be_a(String) }
-
-      it 'should be an UUID' do
-        hex = '[0-9a-fA-F]'
-        expect(subject)
-          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
-      end
+      it { is_expected.to match_uuid_format }
     end
   end
 
@@ -323,18 +341,6 @@ RSpec.describe Cab::Models::VicariousAuthority do
     end
   end
 
-  describe '#content' do
-    subject(:result) { instance.content }
-
-    let(:instance) { create(:vicarious_authority) }
-
-    describe 'result' do
-      subject { result }
-
-      it { is_expected.to be_a(String) }
-    end
-  end
-
   describe '#created_at' do
     subject(:result) { instance.created_at }
 
@@ -344,6 +350,25 @@ RSpec.describe Cab::Models::VicariousAuthority do
       subject { result }
 
       it { is_expected.to be_a(Time) }
+    end
+  end
+
+  describe '#file_id' do
+    subject(:result) { instance.file_id }
+
+    let(:instance) { create(:vicarious_authority) }
+
+    describe 'result' do
+      subject { result }
+
+      it { is_expected.to be_a(String) }
+      it { is_expected.to match_uuid_format }
+
+      let(:file) { Cab::Models::File.where(id: subject).first }
+
+      it 'should be a primary key in the tables of files' do
+        expect(file).not_to be_nil
+      end
     end
   end
 
@@ -539,26 +564,6 @@ RSpec.describe Cab::Models::VicariousAuthority do
       end
     end
 
-    context 'when `content` property is present in parameters' do
-      let(:params) { { content: value } }
-
-      context 'when the value is of String' do
-        let(:value) { create(:string) }
-
-        it 'should set `content` attribute of the instance to the value' do
-          expect { subject }.to change { instance.content }.to(value)
-        end
-      end
-
-      context 'when the value is nil' do
-        let(:value) { nil }
-
-        it 'should raise Sequel::InvalidValue' do
-          expect { subject }.to raise_error(Sequel::InvalidValue)
-        end
-      end
-    end
-
     context 'when `created_at` property is present in parameters' do
       let(:params) { { created_at: value } }
 
@@ -590,6 +595,59 @@ RSpec.describe Cab::Models::VicariousAuthority do
 
         it 'should set `created_at` attribute to the value' do
           expect(instance.created_at).to be_within(1).of(value)
+        end
+      end
+
+      context 'when the value is nil' do
+        let(:value) { nil }
+
+        it 'should raise Sequel::InvalidValue' do
+          expect { subject }.to raise_error(Sequel::InvalidValue)
+        end
+      end
+    end
+
+    context 'when `file_id` property is present in parameters' do
+      let(:params) { { file_id: value } }
+
+      context 'when the value is of String' do
+        context 'when the value is an UUID' do
+          context 'when the value is not a primary key in files table' do
+            let(:value) { create(:uuid) }
+
+            it 'should raise Sequel::ForeignKeyConstraintViolation' do
+              expect { subject }
+                .to raise_error(Sequel::ForeignKeyConstraintViolation)
+            end
+          end
+
+          context 'when the value is a primary key in files table' do
+            context 'when the value repeats' do
+              let(:value) { other_vicarious_authority.file_id }
+              let(:other_vicarious_authority) { create(:vicarious_authority) }
+
+              it 'should raise Sequel::UniqueConstraintViolation' do
+                expect { subject }
+                  .to raise_error(Sequel::UniqueConstraintViolation)
+              end
+            end
+
+            context 'when the value doesn\'t repeat' do
+              let(:value) { create(:file).id }
+
+              it 'should set `file_id` attribute to the value' do
+                expect { subject }.to change { instance.file_id }.to(value)
+              end
+            end
+          end
+        end
+
+        context 'when the value isn\'t an UUID' do
+          let(:value) { 'isn\'t an UUID' }
+
+          it 'should raise Sequel::DatabaseError' do
+            expect { subject }.to raise_error(Sequel::DatabaseError)
+          end
         end
       end
 

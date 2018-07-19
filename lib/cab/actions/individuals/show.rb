@@ -17,10 +17,7 @@ module Cab
             result[:client_type] = :individual
             expand_json(result, :registration_address)
             expand_json(result, :residential_address)
-            next unless extended?
-            agreement = result.delete(:agreement)
-            result[:consent_to_processing] = { content: agreement.to_s }
-            result[:identity_documents] = identity_documents
+            result[:identity_documents] = identity_documents if extended?
           end
         end
 
@@ -51,7 +48,7 @@ module Cab
 
         # Названия полей записи физического лица, извлекаемых из базы данных
         # в случае, когда необходимо возвращать информацию о документах
-        EXTENDED_FIELDS = [*FIELDS, :agreement].freeze
+        EXTENDED_FIELDS = [*FIELDS, :agreement_id].freeze
 
         # Возвращает ассоциативный массив полей записи физического лица
         # @return [Hash]
@@ -84,7 +81,7 @@ module Cab
           :issued_by,
           :to_char.sql_function(:issue_date, 'DD.MM.YYYY').as(:issue_date),
           :to_char.sql_function(:expiration_end, 'DD.MM.YYYY').as(:due_date),
-          :content
+          :file_id
         ].freeze
 
         # Возвращает список с информацией о документах, удостоверяющих личность

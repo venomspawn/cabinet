@@ -32,7 +32,7 @@ module Cab
             due_date: {
               type: %i[string null]
             },
-            content: {
+            file_id: {
               type: :string
             }
           },
@@ -41,7 +41,7 @@ module Cab
             title
             issued_by
             issue_date
-            content
+            file_id
           ]
         }.freeze
       end

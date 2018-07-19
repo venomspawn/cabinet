@@ -10,37 +10,21 @@ RSpec.describe Cab::Actions::Documents do
   end
 
   describe '.update' do
-    subject(:result) { described_class.update(id, params) }
+    subject(:result) { described_class.update(params) }
 
+    let(:params) { { id: id, content: content } }
     let(:id) { document.id }
     let(:document) { create(:identity_document) }
-    let(:params) { create('params/actions/documents/update', traits) }
-    let(:traits) { {} }
+    let(:content) { create(:string) }
+    let(:file) { Cab::Models::File.with_pk(document.file_id) }
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { document.reload.created_at }
     end
 
-    it 'should update content of the document' do
+    it 'should update content of the document\'s file' do
       subject
-      document.reload
-      expect(document.content).to be == params[:content]
-    end
-
-    context 'when there is `id` property in params' do
-      let(:traits) { :with_id }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { document.reload.id }
-      end
-    end
-
-    context 'when there is additional property in params' do
-      let(:traits) { { content: document.content, additional: :property } }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { document.reload.values }
-      end
+      expect(file.reload.content).to be == content
     end
 
     context 'when params is of String type' do

@@ -157,7 +157,7 @@ module Cab
                 due_date: {
                   type: %i[string null]
                 },
-                content: {
+                file_id: {
                   type: :string
                 }
               },
@@ -166,19 +166,11 @@ module Cab
                 series
                 issued_by
                 issue_date
-                content
+                file_id
               ]
             },
-            consent_to_processing: {
-              type: :object,
-              properties: {
-                content: {
-                  type: :string
-                }
-              },
-              required: %i[
-                content
-              ]
+            agreement_id: {
+              type: :string
             },
             spokesman: {
               type: %i[object null],
@@ -207,7 +199,7 @@ module Cab
                 due_date: {
                   type: %i[string null]
                 },
-                content: {
+                file_id: {
                   type: :string
                 }
               },
@@ -216,7 +208,7 @@ module Cab
                 title
                 issued_by
                 issue_date
-                content
+                file_id
               ]
             }
           },
@@ -229,7 +221,7 @@ module Cab
             citizenship
             residential_address
             identity_document
-            consent_to_processing
+            agreement_id
           ]
         }.freeze
       end

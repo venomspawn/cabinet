@@ -166,7 +166,7 @@ module Cab
                     due_date: {
                       type: %i[string null]
                     },
-                    content: {
+                    file_id: {
                       type: :string
                     }
                   },
@@ -175,19 +175,11 @@ module Cab
                     series
                     issued_by
                     issue_date
-                    content
+                    file_id
                   ]
                 },
-                consent_to_processing: {
-                  type: :object,
-                  properties: {
-                    content: {
-                      type: :string
-                    }
-                  },
-                  required: %i[
-                    content
-                  ]
+                agreement_id: {
+                  type: :string
                 },
                 bank_details: {
                   type: %i[object null],
@@ -233,7 +225,7 @@ module Cab
                     due_date: {
                       type: %i[string null]
                     },
-                    content: {
+                    file_id: {
                       type: :string
                     }
                   },
@@ -242,7 +234,7 @@ module Cab
                     title
                     issued_by
                     issue_date
-                    content
+                    file_id
                   ]
                 }
               },
@@ -257,7 +249,7 @@ module Cab
                 registration_address
                 actual_address
                 identity_document
-                consent_to_processing
+                agreement_id
               ]
             },
             {
@@ -357,7 +349,7 @@ module Cab
                     due_date: {
                       type: %i[string null]
                     },
-                    content: {
+                    file_id: {
                       type: :string
                     }
                   },
@@ -366,7 +358,7 @@ module Cab
                     title
                     issued_by
                     issue_date
-                    content
+                    file_id
                   ]
                 }
               },

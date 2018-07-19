@@ -83,7 +83,7 @@ module Cab
           inn
           snils
           registration_address
-          consent_to_processing
+          agreement_id
           identity_documents
         ].freeze
 

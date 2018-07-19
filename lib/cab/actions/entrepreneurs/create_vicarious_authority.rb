@@ -62,7 +62,7 @@ module Cab
           issued_by:       :issued_by,
           issue_date:      :issue_date,
           expiration_date: :due_date,
-          content:         :content,
+          file_id:         :file_id,
           created_at:      Time.method(:now)
         }.freeze
 

@@ -94,7 +94,7 @@ module Cab
                   due_date: {
                     type: %i[null string]
                   },
-                  content: {
+                  file_id: {
                     type: :string
                   }
                 },
@@ -105,23 +105,14 @@ module Cab
                   issued_by
                   issue_date
                   due_date
-                  content
+                  file_id
                 ],
                 additionalProperties: false
               },
               minItems: 1
             },
-            consent_to_processing: {
-              type: :object,
-              properties: {
-                content: {
-                  type: :string
-                }
-              },
-              required: %i[
-                content
-              ],
-              additionalProperties: false
+            agreement_id: {
+              type: :string
             }
           },
           required: %i[

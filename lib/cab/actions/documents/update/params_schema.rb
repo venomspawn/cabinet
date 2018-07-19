@@ -4,17 +4,29 @@ module Cab
   module Actions
     module Documents
       class Update
+        # Выражение для шестнадцатеричной цифры
+        HEX = '[a-fA-F0-9]'
+
+        # Регулярное выражение для проверки на формат UUID
+        UUID_FORMAT = /\A#{HEX}{8}-#{HEX}{4}-#{HEX}{4}-#{HEX}{4}-#{HEX}{12}\z/
+
         # JSON-схема параметров действия
         PARAMS_SCHEMA = {
           type: :object,
-          property: {
+          properties: {
+            id: {
+              type: :string,
+              pattern: UUID_FORMAT
+            },
             content: {
-              type: :string
+              not: { type: :null }
             }
           },
           required: %i[
+            id
             content
-          ]
+          ],
+          additionalProperties: false
         }.freeze
       end
     end

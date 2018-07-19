@@ -5,19 +5,19 @@
 
 FactoryBot.define do
   factory 'params/actions/individuals/create', class: Hash do
-    first_name            { create(:string) }
-    last_name             { create(:string) }
-    middle_name           { create(:string) }
-    birth_place           { create(:string) }
-    birth_date            { create(:date).strftime('%d.%m.%Y') }
-    sex                   { create(:enum, values: %w[male female]) }
-    citizenship           { create(:enum, values: %w[russian foreign absent]) }
-    snils                 { create(:snils) }
-    inn                   { create(:string, length: 12) }
-    registration_address  { create(:address) }
-    residential_address   { create(:address) }
-    identity_document     { create('params/identity_document') }
-    consent_to_processing { { content: create(:string) } }
+    first_name           { create(:string) }
+    last_name            { create(:string) }
+    middle_name          { create(:string) }
+    birth_place          { create(:string) }
+    birth_date           { create(:date).strftime('%d.%m.%Y') }
+    sex                  { create(:enum, values: %w[male female]) }
+    citizenship          { create(:enum, values: %w[russian foreign absent]) }
+    snils                { create(:snils) }
+    inn                  { create(:string, length: 12) }
+    registration_address { create(:address) }
+    residential_address  { create(:address) }
+    identity_document    { create('params/identity_document') }
+    agreement_id         { create(:file).id }
 
     trait :with_spokesman do
       spokesman { create('params/spokesman') }

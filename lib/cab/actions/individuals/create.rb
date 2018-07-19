@@ -65,7 +65,7 @@ module Cab
           inn:                  :inn,
           registration_address: :registration_address,
           residence_address:    :residential_address,
-          agreement:            %i[consent_to_processing content],
+          agreement_id:         :agreement_id,
           created_at:           Time.method(:now)
         }.freeze
 
@@ -96,7 +96,7 @@ module Cab
           issued_by:      %i[identity_document issued_by],
           issue_date:     %i[identity_document issue_date],
           expiration_end: %i[identity_document due_date],
-          content:        %i[identity_document content],
+          file_id:        %i[identity_document file_id],
           created_at:     Time.method(:now)
         }.freeze
 
@@ -137,7 +137,7 @@ module Cab
           issued_by:       %i[spokesman issued_by],
           issue_date:      %i[spokesman issue_date],
           expiration_date: %i[spokesman due_date],
-          content:         %i[spokesman content],
+          file_id:         %i[spokesman file_id],
           created_at:      Time.method(:now)
         }.freeze
 

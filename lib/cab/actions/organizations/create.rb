@@ -90,7 +90,7 @@ module Cab
           issued_by:       %i[spokesman issued_by],
           issue_date:      %i[spokesman issue_date],
           expiration_date: %i[spokesman due_date],
-          content:         %i[spokesman content],
+          file_id:         %i[spokesman file_id],
           created_at:      Time.method(:now)
         }.freeze
 

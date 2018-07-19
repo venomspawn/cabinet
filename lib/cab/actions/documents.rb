@@ -8,12 +8,10 @@ module Cab
       require_relative 'documents/update'
 
       # Обновляет содержимое файла документа, удостоверяющего личность
-      # @param [String] id
-      #   идентификатор записи
       # @param [Object] params
       #   объект с информацией о параметрах действия
-      def self.update(id, params)
-        Update.new(id, params).update
+      def self.update(params)
+        Update.new(params).update
       end
     end
   end

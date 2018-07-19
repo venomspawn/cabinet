@@ -35,14 +35,14 @@ module Cab
     #   Дата окончания действия
     #   @return [Date]
     #     дата окончания действия
-    # @!attribute content
-    #   Содержимое файла
-    #   @return [String]
-    #     содержимое файла
     # @!attribute created_at
     #   Дата и время создания
     #   @return [Time]
     #     дата и время создания
+    # @!attribute file_id
+    #   Идентификатор записи файла
+    #   @return [String]
+    #     идентификатор записи файла
     class VicariousAuthority < Sequel::Model
     end
   end
