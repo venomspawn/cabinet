@@ -421,7 +421,7 @@ RSpec.describe Cab::Actions::Individuals do
         it { is_expected.to match_json_schema(schema) }
 
         it 'shouldn\'t include information about consent to processing' do
-          expect(result).not_to include(:consent_to_processing)
+          expect(result).not_to include(:agreement_id)
         end
 
         it 'shouldn\'t include information about identity documents' do
@@ -435,7 +435,7 @@ RSpec.describe Cab::Actions::Individuals do
         it { is_expected.to match_json_schema(schema) }
 
         it 'shouldn\'t include information about consent to processing' do
-          expect(result).not_to include(:consent_to_processing)
+          expect(result).not_to include(:agreement_id)
         end
 
         it 'shouldn\'t include information about identity documents' do
@@ -449,7 +449,7 @@ RSpec.describe Cab::Actions::Individuals do
         it { is_expected.to match_json_schema(schema) }
 
         it 'should include information about consent to processing' do
-          expect(result).to include(:consent_to_processing)
+          expect(result).to include(:agreement_id)
         end
 
         it 'should include information about identity documents' do

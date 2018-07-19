@@ -80,7 +80,7 @@ module Cab
           registration_address:  :registration_address,
           residential_address:   :registration_address,
           identity_document:     :identity_document,
-          consent_to_processing: :consent_to_processing
+          agreement_id:          :agreement_id
         }.freeze
 
         # Возвращает ассоциативный массив параметров создания записи
@@ -150,7 +150,7 @@ module Cab
           issued_by:       %i[spokesman issued_by],
           issue_date:      %i[spokesman issue_date],
           expiration_date: %i[spokesman due_date],
-          content:         %i[spokesman content],
+          file_id:         %i[spokesman file_id],
           created_at:      Time.method(:now)
         }.freeze
 

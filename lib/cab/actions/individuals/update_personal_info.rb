@@ -71,7 +71,7 @@ module Cab
           issued_by:      %i[identity_document issued_by],
           issue_date:     %i[identity_document issue_date],
           expiration_end: %i[identity_document due_date],
-          content:        %i[identity_document content],
+          file_id:        %i[identity_document file_id],
           created_at:     Time.method(:now)
         }.freeze
 
