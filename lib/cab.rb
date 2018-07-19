@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'set'
-
 require_relative 'cab/init'
 
 # Корневое пространство имён для всех классов сервиса
@@ -44,7 +42,7 @@ module Cab
   PRODUCTION = 'production'
 
   # Множество типов окружений
-  ENVIRONMENTS = [DEVELOPMENT, TEST, PRODUCTION].to_set
+  ENVIRONMENTS = [DEVELOPMENT, TEST, PRODUCTION].freeze
 
   # Возвращает значение переменной окружения `RACK_ENV` или строку
   # {DEVELOPMENT}, если значение переменной окружения `RACK_ENV` отсутствует
@@ -82,6 +80,13 @@ module Cab
   # Расширение файлов исходного кода
   RB_EXT = '.rb'
 
+  # Пустой список
+  EMPTY = [].freeze
+
+  # Одноэлементный список, подставляемый для пропуска ошибок класса
+  # `StandardError`
+  SKIP_STANDARD_ERROR = [StandardError].freeze
+
   # Загружает один или несколько файлов исходного кода согласно маске,
   # включающей в себя частичный путь от директории по пути {lib}. Добавляет в
   # конец маски строку `.rb`, если она отсутствует. Не создаёт исключений, если
@@ -95,15 +100,36 @@ module Cab
   #   дочерних директориях
   # @param [#to_s] mask
   #   маска
-  def self.need(mask)
+  # @param [NilClass, Hash] opts
+  #   ассоциативный массив настроек загрузки или `nil`, если настройки
+  #   отсутствуют. Поддерживаются следующие ключи.
+  #   *   `:skip_errors`. На основе значения по этому ключу формируется набор
+  #       классов ошибок, которые пропускаются при загрузке. Значение может
+  #       быть классом, списком и булевой константой `true`. В последнем случае
+  #       в качестве набора классов ошибок берётся одноэлементный список из
+  #       `StandardError`. При иных значениях подставляется пустой список.
+  def self.need(mask, opts = nil)
     mask = mask.to_s
     mask = "#{mask}.rb" unless mask.end_with?(RB_EXT)
-    Dir["#{lib}/#{mask}"].each do |filepath|
-      begin
-        require filepath
-      rescue StandardError => error
-        puts "`#{filepath}`: `#{error.class}`: `#{error.message}`"
-      end
-    end
+    skip_errors = opts[:skip_errors] if opts.is_a?(Hash)
+    skip = case skip_errors
+           when Class     then [skip_errors]
+           when Array     then skip_errors
+           when TrueClass then SKIP_STANDARD_ERROR
+           else                EMPTY
+           end
+    Dir["#{lib}/#{mask}"].each { |path| require_file(path, skip) }
+  end
+
+  # Загружает файл по предоставленному пути. При возникновении ошибок
+  # пропускает их, если их классы находятся в предоставленном наборе.
+  # @param [to_s] path
+  #   путь до файла
+  # @param [#include?] skip
+  #   набор классов ошибок, которые должны быть пропущены при загрузке
+  def self.require_file(path, skip = EMPTY)
+    require path.to_s
+  rescue StandardError => error
+    raise error if error.class.ancestors.find(&skip.method(:include?)).nil?
   end
 end
