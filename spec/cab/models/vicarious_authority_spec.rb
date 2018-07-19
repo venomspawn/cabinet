@@ -169,6 +169,16 @@ RSpec.describe Cab::Models::VicariousAuthority do
         end
       end
 
+      context 'when value of `file_id` property repeats' do
+        let(:params) { attributes_for(:vicarious_authority, file_id: value) }
+        let(:value) { other_vicarious_authority.file_id }
+        let(:other_vicarious_authority) { create(:vicarious_authority) }
+
+        it 'should raise Sequel::UniqueConstraintViolation' do
+          expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
+        end
+      end
+
       context 'when value of `file_id` is not a primary key' do
         let(:params) { attributes_for(:vicarious_authority, traits) }
         let(:traits) { { file_id: value } }
@@ -612,10 +622,22 @@ RSpec.describe Cab::Models::VicariousAuthority do
           end
 
           context 'when the value is a primary key in files table' do
-            let(:value) { create(:file).id }
+            context 'when the value repeats' do
+              let(:value) { other_vicarious_authority.file_id }
+              let(:other_vicarious_authority) { create(:vicarious_authority) }
 
-            it 'should set `file_id` attribute to the value' do
-              expect { subject }.to change { instance.file_id }.to(value)
+              it 'should raise Sequel::UniqueConstraintViolation' do
+                expect { subject }
+                  .to raise_error(Sequel::UniqueConstraintViolation)
+              end
+            end
+
+            context 'when the value doesn\'t repeat' do
+              let(:value) { create(:file).id }
+
+              it 'should set `file_id` attribute to the value' do
+                expect { subject }.to change { instance.file_id }.to(value)
+              end
             end
           end
         end

@@ -234,6 +234,16 @@ RSpec.describe Cab::Models::Individual do
         end
       end
 
+      context 'when value of `agreement_id` property repeats' do
+        let(:params) { attributes_for(:individual, agreement_id: value) }
+        let(:value) { other_individual.agreement_id }
+        let(:other_individual) { create(:individual) }
+
+        it 'should raise Sequel::UniqueConstraintViolation' do
+          expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
+        end
+      end
+
       context 'when value of `agreement_id` is not a primary key' do
         let(:params) { attributes_for(:individual, traits) }
         let(:traits) { { agreement_id: value } }
@@ -964,7 +974,7 @@ RSpec.describe Cab::Models::Individual do
 
       context 'when the value is of String' do
         context 'when the value is an UUID' do
-          context 'when the value is not a primary key in files table' do
+          context 'when the value is not a primary key in agreements table' do
             let(:value) { create(:uuid) }
 
             it 'should raise Sequel::ForeignKeyConstraintViolation' do
@@ -973,11 +983,25 @@ RSpec.describe Cab::Models::Individual do
             end
           end
 
-          context 'when the value is a primary key in files table' do
-            let(:value) { create(:file).id }
+          context 'when the value is a primary key in agreements table' do
+            context 'when the value repeats' do
+              let(:value) { other_individual.agreement_id }
+              let(:other_individual) { create(:individual) }
 
-            it 'should set `agreement_id` attribute to the value' do
-              expect { subject }.to change { instance.agreement_id }.to(value)
+              it 'should raise Sequel::UniqueConstraintViolation' do
+                expect { subject }
+                  .to raise_error(Sequel::UniqueConstraintViolation)
+              end
+            end
+
+            context 'when the value doesn\'t repeat' do
+              let(:value) { create(:file).id }
+
+              it 'should set `agreement_id` attribute to the value' do
+                expect { subject }
+                  .to change { instance.agreement_id }
+                  .to(value)
+              end
             end
           end
         end

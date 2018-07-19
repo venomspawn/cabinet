@@ -41,6 +41,125 @@ RSpec.describe Cab::Actions::Individuals do
         .by(1)
     end
 
+    context 'when file of agreement isn\'t found' do
+      let(:traits) { [agreement_id: create(:uuid)] }
+
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::Individual.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::IdentityDocument.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when file of agreement belongs to other individual record' do
+      let(:traits) { [agreement_id: agreement_id] }
+      let(:agreement_id) { other_individual.agreement_id }
+      let!(:other_individual) { create(:individual) }
+
+      it 'should raise Sequel::UniqueConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::Individual.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::IdentityDocument.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when file of identity document isn\'t found' do
+      let(:traits) { [identity_document: doc] }
+      let(:doc) { create('params/identity_document', file_id: file_id) }
+      let(:file_id) { create(:uuid) }
+
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::Individual.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::IdentityDocument.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when file of identity document belongs to other document' do
+      let(:traits) { [identity_document: doc] }
+      let(:doc) { create('params/identity_document', file_id: file_id) }
+      let(:file_id) { other_document.file_id }
+      let!(:other_document) { create(:identity_document) }
+
+      it 'should raise Sequel::UniqueConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::Individual.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::IdentityDocument.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
+      end
+    end
+
     context 'when there is information about spokesman' do
       let(:traits) { %i[with_spokesman] }
 
@@ -79,6 +198,68 @@ RSpec.describe Cab::Actions::Individuals do
             .by(0)
           expect { subject }
             .to raise_error(Sequel::NoMatchingRow)
+            .and change { Cab::Models::IndividualSpokesman.count }
+            .by(0)
+        end
+      end
+
+      context 'when file of vicarious authority isn\'t found' do
+        let(:traits) { [:with_spokesman, spokesman: spokesman] }
+        let!(:spokesman) { create('params/spokesman', file_id: file_id) }
+        let(:file_id) { create(:uuid) }
+
+        it 'should raise Sequel::ForeignKeyConstraintViolation' do
+          expect { subject }
+            .to raise_error(Sequel::ForeignKeyConstraintViolation)
+        end
+
+        it 'shouldn\'t create records' do
+          expect { subject }
+            .to raise_error(Sequel::ForeignKeyConstraintViolation)
+            .and change { Cab::Models::Individual.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::ForeignKeyConstraintViolation)
+            .and change { Cab::Models::IdentityDocument.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::ForeignKeyConstraintViolation)
+            .and change { Cab::Models::VicariousAuthority.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::ForeignKeyConstraintViolation)
+            .and change { Cab::Models::IndividualSpokesman.count }
+            .by(0)
+        end
+      end
+
+      context 'when file of vicarious authority belongs to other record' do
+        let(:traits) { [:with_spokesman, spokesman: spokesman] }
+        let(:args) { { spokesman: spokesman } }
+        let!(:spokesman) { create('params/spokesman', file_id: file_id) }
+        let(:file_id) { other_vicarious_authority.file_id }
+        let(:other_vicarious_authority) { create(:vicarious_authority) }
+
+        it 'should raise Sequel::UniqueConstraintViolation' do
+          expect { subject }
+            .to raise_error(Sequel::UniqueConstraintViolation)
+        end
+
+        it 'shouldn\'t create records' do
+          expect { subject }
+            .to raise_error(Sequel::UniqueConstraintViolation)
+            .and change { Cab::Models::Individual.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::UniqueConstraintViolation)
+            .and change { Cab::Models::IdentityDocument.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::UniqueConstraintViolation)
+            .and change { Cab::Models::VicariousAuthority.count }
+            .by(0)
+          expect { subject }
+            .to raise_error(Sequel::UniqueConstraintViolation)
             .and change { Cab::Models::IndividualSpokesman.count }
             .by(0)
         end
@@ -189,6 +370,47 @@ RSpec.describe Cab::Actions::Individuals do
         expect { subject }
           .to raise_error(Sequel::NoMatchingRow)
           .and change { Cab::Models::IndividualSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when file isn\'t found' do
+      let(:traits) { { file_id: create(:uuid) } }
+
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::EntrepreneurSpokesman.count }
+          .by(0)
+      end
+    end
+
+    context 'when file belongs to other vicarious authority' do
+      let(:traits) { { file_id: file_id } }
+      let(:file_id) { other_vicarious_authority.file_id }
+      let!(:other_vicarious_authority) { create(:vicarious_authority) }
+
+      it 'should raise Sequel::UniqueConstraintViolation' do
+        expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
+      end
+
+      it 'shouldn\'t create records' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::VicariousAuthority.count }
+          .by(0)
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::EntrepreneurSpokesman.count }
           .by(0)
       end
     end
@@ -603,7 +825,8 @@ RSpec.describe Cab::Actions::Individuals do
     let(:id) { individual.id }
     let(:individual) { create(:individual) }
     let(:params_factory) { 'params/actions/individuals/update_personal_info' }
-    let(:params) { create(params_factory) }
+    let(:params) { create(params_factory, *traits) }
+    let(:traits) { [] }
 
     describe 'result' do
       subject { result }
@@ -632,6 +855,43 @@ RSpec.describe Cab::Actions::Individuals do
       expect { subject }
         .to change { Cab::Models::IdentityDocument.count }
         .by(1)
+    end
+
+    context 'when file of identity document isn\'t found' do
+      let(:traits) { [identity_document: doc] }
+      let(:doc) { create('params/identity_document', file_id: file_id) }
+      let(:file_id) { create(:uuid) }
+
+      it 'should raise Sequel::ForeignKeyConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+      end
+
+      it 'shouldn\'t create record of identity document of the individual' do
+        expect { subject }
+          .to raise_error(Sequel::ForeignKeyConstraintViolation)
+          .and change { Cab::Models::IdentityDocument.count }
+          .by(0)
+      end
+    end
+
+    context 'when file of identity document belongs to other document' do
+      let(:traits) { [identity_document: doc] }
+      let(:doc) { create('params/identity_document', file_id: file_id) }
+      let(:file_id) { other_document.file_id }
+      let!(:other_document) { create(:identity_document) }
+
+      it 'should raise Sequel::UniqueConstraintViolation' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+      end
+
+      it 'shouldn\'t create record of identity document of the individual' do
+        expect { subject }
+          .to raise_error(Sequel::UniqueConstraintViolation)
+          .and change { Cab::Models::IdentityDocument.count }
+          .by(0)
+      end
     end
 
     context 'when there is `id` property in params' do
