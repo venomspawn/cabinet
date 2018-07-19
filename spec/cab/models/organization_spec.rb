@@ -259,12 +259,7 @@ RSpec.describe Cab::Models::Organization do
       subject { result }
 
       it { is_expected.to be_a(String) }
-
-      it 'should be an UUID' do
-        hex = '[0-9a-fA-F]'
-        expect(subject)
-          .to match(/\A#{hex}{8}-#{hex}{4}-#{hex}{4}-#{hex}{4}-#{hex}{12}\z/)
-      end
+      it { is_expected.to match_uuid_format }
     end
   end
 

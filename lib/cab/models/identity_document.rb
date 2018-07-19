@@ -35,10 +35,6 @@ module Cab
     #   Код выдавшего подразделения
     #   @return [String]
     #     код выдавшего подразделения
-    # @!attribute content
-    #   Содержимое файла
-    #   @return [String]
-    #     содержимое файла
     # @!attribute created_at
     #   Дата и время создания
     #   @return [Time]
@@ -47,6 +43,10 @@ module Cab
     #   Идентификатор записи физического лица
     #   @return [String]
     #     идентификатор записи физического лица
+    # @!attribute file_id
+    #   Идентификатор записи файла
+    #   @return [String]
+    #     идентификтаор записи файла
     class IdentityDocument < Sequel::Model
       # Типы документов
       TYPES = %i[

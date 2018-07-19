@@ -12,7 +12,7 @@ FactoryBot.define do
     issued_by       { create(:string) }
     issue_date      { create(:date) }
     expiration_date { create(:date) }
-    content         { create(:string) }
     created_at      { Time.now }
+    file_id         { create(:file).id }
   end
 end

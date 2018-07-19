@@ -13,8 +13,14 @@ Sequel.migration do
       column :issued_by,       :text, null: false
       column :issue_date,      :date, null: false
       column :expiration_date, :date
-      column :content,         :bytea, null: false
       column :created_at,      :timestamp, null: false
+
+      foreign_key :file_id, :files,
+                  type:      :uuid,
+                  null:      false,
+                  unique:    true,
+                  on_delete: :restrict,
+                  on_update: :cascade
     end
   end
 end

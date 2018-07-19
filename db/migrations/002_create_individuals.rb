@@ -21,8 +21,14 @@ Sequel.migration do
       column :registration_address,   :jsonb
       column :residence_address,      :jsonb, null: false
       column :temp_residence_address, :jsonb
-      column :agreement,              :bytea, null: false
       column :created_at,             :timestamp, null: false
+
+      foreign_key :agreement_id, :files,
+                  type:      :uuid,
+                  null:      false,
+                  unique:    true,
+                  on_delete: :restrict,
+                  on_update: :cascade
 
       index :name,
             name:    :individuals_name_trgm_index,
