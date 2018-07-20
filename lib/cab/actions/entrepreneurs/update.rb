@@ -12,8 +12,8 @@ module Cab
         # Обновляет поля записи индивидуального предпринимателя
         def update
           Sequel::Model.db.transaction(savepoint: true) do
-            record.update(entrepreneur_params)
-            individual.update(individual_params)
+            update_entrepreneur
+            update_individual
           end
         end
 
@@ -36,13 +36,17 @@ module Cab
             Models::Entrepreneur.select(:id, :individual_id).with_pk!(id)
         end
 
-        # Возвращает запись физического лица
-        # @return [Cab::Models::Individual]
-        #   запись физического лица
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись физического лица не найдена
-        def individual
-          Models::Individual.select(:id).with_pk!(record.individual_id)
+        # Обновляет поля записи индивидуального предпринимателя
+        def update_entrepreneur
+          record.update(entrepreneur_params)
+        end
+
+        # Обновляет поля записи физического лица, к которой прикреплена запись
+        # индивидуального предпринимателя
+        def update_individual
+          Models::Individual
+            .where(id: record.individual_id)
+            .update(individual_params)
         end
 
         # Ассоциативный массив, отображающий названия ключей ассоциативного

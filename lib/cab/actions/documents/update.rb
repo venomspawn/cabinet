@@ -12,7 +12,7 @@ module Cab
 
         # Обновляет содержимое файла документа, удостоверяющего личность
         def update
-          file.update(content: read_content)
+          Models::File.where(id: record.file_id).update(content: read_content)
         end
 
         private
@@ -38,15 +38,6 @@ module Cab
         #   если запись документа, удостоверяющего личность, не найдена
         def record
           Models::IdentityDocument.select(:file_id).with_pk!(id)
-        end
-
-        # Возвращает запись файла документа, удостоверяющего личность
-        # @return [Cab::Models::File]
-        #   запись файла документа, удостоверяющего личность
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись документа, удостоверяющего личность, не найдена
-        def file
-          Models::File.select(:id).with_pk(record.file_id)
         end
 
         # Возвращает содержимое файла

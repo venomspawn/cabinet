@@ -19,7 +19,7 @@ module Cab
         #   результирующий ассоциативный массив
         def update
           Sequel::Model.db.transaction(savepoint: true) do
-            individual.update(individual_params)
+            update_individual
             document = create_identity_document
             { identity_document_id: document.id }
           end
@@ -43,13 +43,12 @@ module Cab
           Models::Entrepreneur.select(:individual_id).with_pk!(id)
         end
 
-        # Возвращает запись физического лица, на которую ссылается запись
+        # Обновляет поля записи физического лица, к которой прикреплена запись
         # индивидуального предпринимателя
-        # @return [Cab::Models::Individual]
-        #   запись физического лица
-        def individual
-          @individual ||=
-            Models::Individual.select(:id).with_pk!(record.individual_id)
+        def update_individual
+          Models::Individual
+            .where(id: record.individual_id)
+            .update(individual_params)
         end
 
         # Ассоциативный массив, отображающий названия ключей ассоциативного
@@ -99,7 +98,7 @@ module Cab
         #   результирующий ассоциативный массив
         def identity_document_params
           extract_params(IDENTITY_DOCUMENT_FIELDS).tap do |hash|
-            hash[:individual_id] = individual.id
+            hash[:individual_id] = record.individual_id
           end
         end
       end

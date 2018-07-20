@@ -27,19 +27,12 @@ module Cab
 
         private
 
-        # Возвращает запись представителя или `nil`, если запись физического
-        # лица создаётся без указания записи представителя
-        # @return [Cab::Models::Individual]
-        #   запись представителя
-        # @return [NilClass]
-        #   если запись физического лица создаётся без указания записи
-        #   представителя
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись представителя не найдена
+        # Возвращает значение параметра `spokesman` или `nil`, если значение
+        # параметра не указано
+        # @return [Object]
+        #   значение параметра `spokesman`
         def spokesman
-          return if params[:spokesman].nil?
-          @spokesman ||=
-            Models::Individual.select(:id).with_pk!(params[:spokesman][:id])
+          params[:spokesman]
         end
 
         # Создаёт и возвращает запись физического лица
@@ -176,7 +169,7 @@ module Cab
         def individual_spokesman_params(record, vicarious_authority)
           {
             created_at:             Time.now,
-            spokesman_id:           spokesman.id,
+            spokesman_id:           spokesman[:id],
             individual_id:          record.id,
             vicarious_authority_id: vicarious_authority.id
           }

@@ -17,51 +17,38 @@ module Cab
         #   результирующий ассоциативный массив
         def create
           Sequel::Model.db.transaction(savepoint: true) do
-            individual = process_individual
-            record = create_entrepreneur(individual)
+            individual_id = process_individual_id
+            record = create_entrepreneur(individual_id)
             vicarious_authority = create_vicarious_authority
             create_entrepreneur_spokesman(record, vicarious_authority)
-            individual.update(id: record.id)
           end
         end
 
         private
 
-        # Возвращает запись представителя или `nil`, если запись
-        # индивидуального предпринимателя создаётся без указания записи
-        # представителя
-        # @return [Cab::Models::Individual]
-        #   запись представителя
-        # @return [NilClass]
-        #   если запись индивидуального предпринимателя создаётся без указания
-        #   записи представителя
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись представителя не найдена
+        # Возвращает значение параметра `spokesman` или `nil`, если значение
+        # параметра не указано
+        # @return [Object]
+        #   значение параметра `spokesman`
         def spokesman
-          return if params[:spokesman].nil?
-          @spokesman ||=
-            Models::Individual.select(:id).with_pk!(params[:spokesman][:id])
+          params[:spokesman]
         end
 
-        # Возвращает значение параметра `individual_id`
+        # Возвращает значение параметра `individual_id` или `nil`, если
+        # значение параметра не указано
         # @return [Object]
         #   значение параметра `individual_id`
         def individual_id
           params[:individual_id]
         end
 
-        # Извлекает и возвращает ассоциативный массив с информацией о
-        # физическом лице с идентификатором записи, равным значению параметра
-        # `individual_id`, если оно предоставлено. В противном случае создаёт
-        # запись физического лица и возвращает ассоциативный массив с
-        # информацией о физическом лице.
-        # @return [Hash]
-        #   результирующий ассоциативный массив
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись физического лица не найдена
-        def process_individual
-          return Individuals.create(individual_params) if individual_id.nil?
-          { id: Models::Individual.select(:id).with_pk!(individual_id).id }
+        # Создаёт запись физического лица и возвращает её идентификатор, если
+        # значение параметра `individual_id` не указано, в противном случае
+        # возвращает значение параметра `individual_id`
+        # @return [String]
+        #   результирующее значение
+        def process_individual_id
+          individual_id || Individuals.create(individual_params).id
         end
 
         # Ассоциативный массив, отображающий названия ключей ассоциативного
@@ -92,12 +79,12 @@ module Cab
         end
 
         # Создаёт и возвращает запись индивидуального предпринимателя
-        # @param [Hash] individual
-        #   ассоциативный массив с информацией о физическом лице
+        # @param [String] individual_id
+        #   идентификатор записи физического лица
         # @return [Cab::Models::Entrepreneur]
         #   созданная запись
         def create_entrepreneur(individual)
-          record_params = entrepreneur_params(individual)
+          record_params = entrepreneur_params(individual_id)
           create_unrestricted(:Entrepreneur, record_params)
         end
 
@@ -115,24 +102,24 @@ module Cab
 
         # Возвращает ассоциативный массив параметров создания записи
         # индивидуального предпринимателя
-        # @param [Hash] individual
-        #   ассоциативный массив с информацией о физическом лице
+        # @param [String] individual_id
+        #   идентификатор записи физического лица
         # @return [Hash]
         #   результирующий ассоциативный массив
         def entrepreneur_params(individual)
           extract_params(ENTREPRENEUR_FIELDS).tap do |hash|
-            hash[:individual_id] = individual[:id]
+            hash[:individual_id] = individual_id
           end
         end
 
         # Создаёт и возвращает запись документа, подтверждающего полномочия
-        # представителя, если запись физического лица создаётся с указанием его
-        # записи. Возвращает `nil` в противном случае.
+        # представителя, если запись индивидуального предпринимателя создаётся
+        # с указанием его записи. Возвращает `nil` в противном случае.
         # @return [Cab::Models::VicariousAuthority]
         #   запись документа, подтверждающего полномочия представителя
         # @return [NilClass]
-        #   если запись физического лица создаётся без указания записи
-        #   представителя
+        #   если запись индивидуального предпринимателя создаётся без указания
+        #   записи представителя
         def create_vicarious_authority
           return if spokesman.nil?
           create_unrestricted(:VicariousAuthority, vicarious_authority_params)
@@ -189,7 +176,7 @@ module Cab
         def entrepreneur_spokesman_params(record, vicarious_authority)
           {
             created_at:             Time.now,
-            spokesman_id:           spokesman.id,
+            spokesman_id:           spokesman[:id],
             entrepreneur_id:        record.id,
             vicarious_authority_id: vicarious_authority.id
           }

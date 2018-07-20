@@ -18,7 +18,7 @@ Sequel.migration do
                   type:      :uuid,
                   null:      false,
                   unique:    true,
-                  on_delete: :cascade,
+                  on_delete: :restrict,
                   on_update: :cascade
     end
   end
