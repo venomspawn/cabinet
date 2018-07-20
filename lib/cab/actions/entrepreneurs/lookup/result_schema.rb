@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Entrepreneurs
       class Lookup
@@ -18,7 +20,8 @@ module Cab
                     enum: %w[entrepreneur]
                   },
                   id: {
-                    type: :string
+                    type: :string,
+                    pattern: UUID_FORMAT
                   },
                   first_name: {
                     type: :string
@@ -62,7 +65,8 @@ module Cab
                     enum: %w[entrepreneur]
                   },
                   id: {
-                    type: :string
+                    type: :string,
+                    pattern: UUID_FORMAT
                   },
                   first_name: {
                     type: :string
@@ -106,7 +110,8 @@ module Cab
                     enum: %w[individual entrepreneur]
                   },
                   id: {
-                    type: :string
+                    type: :string,
+                    pattern: UUID_FORMAT
                   },
                   first_name: {
                     type: :string

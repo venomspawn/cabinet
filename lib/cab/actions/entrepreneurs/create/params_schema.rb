@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Entrepreneurs
       class Create
@@ -167,7 +169,8 @@ module Cab
                       type: %i[string null]
                     },
                     file_id: {
-                      type: :string
+                      type: :string,
+                      pattern: UUID_FORMAT
                     }
                   },
                   required: %i[
@@ -179,7 +182,8 @@ module Cab
                   ]
                 },
                 agreement_id: {
-                  type: :string
+                  type: :string,
+                  pattern: UUID_FORMAT
                 },
                 bank_details: {
                   type: %i[object null],
@@ -202,7 +206,8 @@ module Cab
                   type: %i[object null],
                   properties: {
                     id: {
-                      type: :string
+                      type: :string,
+                      pattern: UUID_FORMAT
                     },
                     title: {
                       type: :string
@@ -226,7 +231,8 @@ module Cab
                       type: %i[string null]
                     },
                     file_id: {
-                      type: :string
+                      type: :string,
+                      pattern: UUID_FORMAT
                     }
                   },
                   required: %i[
@@ -256,7 +262,8 @@ module Cab
               type: :object,
               properties: {
                 individual_id: {
-                  type: :string
+                  type: :string,
+                  pattern: UUID_FORMAT
                 },
                 commercial_name: {
                   type: %i[string null]
@@ -350,7 +357,8 @@ module Cab
                       type: %i[string null]
                     },
                     file_id: {
-                      type: :string
+                      type: :string,
+                      pattern: UUID_FORMAT
                     }
                   },
                   required: %i[

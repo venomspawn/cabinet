@@ -9,7 +9,8 @@ module Cab
           type: :object,
           properties: {
             identity_document_id: {
-              type: :string
+              type: :string,
+              pattern: UUID_FORMAT
             }
           },
           required: %i[

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Individuals
       class Create
@@ -158,7 +160,8 @@ module Cab
                   type: %i[string null]
                 },
                 file_id: {
-                  type: :string
+                  type: :string,
+                  pattern: UUID_FORMAT
                 }
               },
               required: %i[
@@ -170,13 +173,15 @@ module Cab
               ]
             },
             agreement_id: {
-              type: :string
+              type: :string,
+              pattern: UUID_FORMAT
             },
             spokesman: {
               type: %i[object null],
               properties: {
                 id: {
-                  type: :string
+                  type: :string,
+                  pattern: UUID_FORMAT
                 },
                 title: {
                   type: :string
@@ -200,7 +205,8 @@ module Cab
                   type: %i[string null]
                 },
                 file_id: {
-                  type: :string
+                  type: :string,
+                  pattern: UUID_FORMAT
                 }
               },
               required: %i[

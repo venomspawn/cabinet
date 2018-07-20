@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Organizations
       class Create
@@ -9,7 +11,8 @@ module Cab
           type: :object,
           properties: {
             id: {
-              type: :string
+              type: :string,
+              pattern: UUID_FORMAT
             }
           },
           required: %i[
