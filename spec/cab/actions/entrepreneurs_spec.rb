@@ -20,10 +20,14 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   describe '.create' do
     include described_class::Create::SpecHelper
 
-    subject(:result) { described_class.create(params) }
+    subject(:result) { described_class.create(params, rest) }
 
-    let(:params) { create('params/actions/entrepreneurs/create', *traits) }
+    let(:rest) { nil }
+    let(:params) { data }
+    let(:data) { create('params/actions/entrepreneurs/create', *traits) }
     let(:traits) { %i[with_individual] }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
@@ -253,64 +257,21 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         end
       end
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
   end
 
   describe '.create_vicarious_authority' do
-    subject(:result) { described_class.create_vicarious_authority(params) }
+    subject(:result) { described_class.create_vicarious_authority(*args) }
 
+    let(:args) { [params, rest] }
+    let(:rest) { nil }
     let(:id) { record.id }
     let(:record) { create(:entrepreneur) }
     let(:factory) { 'params/actions/entrepreneurs/create_vicarious_authority' }
-    let(:params) { create(factory, *traits) }
+    let(:params) { data }
+    let(:data) { create(factory, *traits) }
     let(:traits) { [id: id] }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     it 'should create a record of vicarious authority' do
       expect { subject }
@@ -369,60 +330,18 @@ RSpec.describe Cab::Actions::Entrepreneurs do
                               EntrepreneurSpokesman
                             ]
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
   end
 
   describe '.lookup' do
     include described_class::Lookup::SpecHelper
 
-    subject(:result) { described_class.lookup(params) }
+    subject(:result) { described_class.lookup(params, rest) }
+
+    let(:rest) { nil }
+    let(:data) { { first_name: create(:string) } }
+
+    it_should_behave_like 'an action parameters receiver',
+                          wrong_structure: { first_name: 1 }
 
     describe 'result' do
       subject { result }
@@ -528,67 +447,24 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         end
       end
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
   end
 
   describe '.show' do
     include described_class::Show::SpecHelper
 
-    subject(:result) { described_class.show(params) }
+    subject(:result) { described_class.show(params, rest) }
+
+    let(:rest) { nil }
+    let(:data) { { id: id } }
+    let(:id) { entrepreneur.id }
+    let(:entrepreneur) { create(:entrepreneur) }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
 
       let(:params) { { id: id, extended: extended } }
-      let(:id) { entrepreneur.id }
-      let(:entrepreneur) { create(:entrepreneur) }
       let!(:identity_documents) { create_list(:identity_document, 2, traits) }
       let(:traits) { { individual_id: entrepreneur.individual_id } }
 
@@ -634,71 +510,19 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         end
       end
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
-
-    context 'when the record can\'t be found' do
-      let(:params) { { id: create(:uuid) } }
-
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-    end
   end
 
   describe '.update' do
-    subject(:result) { described_class.update(params) }
+    subject(:result) { described_class.update(params, rest) }
 
+    let(:rest) { nil }
     let(:id) { entrepreneur.id }
     let(:entrepreneur) { create(:entrepreneur) }
     let(:individual) { Cab::Models::Individual[entrepreneur.individual_id] }
-    let(:params) { create('params/actions/entrepreneurs/update', id: id) }
+    let(:data) { create('params/actions/entrepreneurs/update', id: id) }
+    let(:params) { data }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { entrepreneur.reload.created_at }
@@ -728,56 +552,24 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       expect(individual.registration_address.to_hash.symbolize_keys)
         .to be == params[:registration_address]
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
-
-    context 'when the record can\'t be found' do
-      let(:id) { create(:uuid) }
-
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-    end
   end
 
   describe '.update_personal_info' do
     include described_class::UpdatePersonalInfo::SpecHelper
 
-    subject(:result) { described_class.update_personal_info(params) }
+    subject(:result) { described_class.update_personal_info(params, rest) }
 
+    let(:rest) { nil }
     let(:id) { entrepreneur.id }
     let(:entrepreneur) { create(:entrepreneur) }
     let(:individual) { Cab::Models::Individual.with_pk!(individual_id) }
     let(:individual_id) { entrepreneur.individual_id }
     let(:factory) { 'params/actions/entrepreneurs/update_personal_info' }
-    let(:params) { create(factory, *traits) }
+    let(:params) { data }
+    let(:data) { create(factory, *traits) }
     let(:traits) { [id: id] }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
@@ -828,42 +620,6 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       it_should_behave_like 'a transactional action',
                             error: Sequel::UniqueConstraintViolation,
                             shouldnt_create: %i[IdentityDocument]
-    end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
-
-    context 'when the record can\'t be found' do
-      let(:id) { create(:uuid) }
-
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
     end
   end
 end
