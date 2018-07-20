@@ -21,8 +21,7 @@ module Cab
             # @return [Status]
             #   200
             controller.get '/organizations' do
-              lookup_data = Oj.load(params[:lookup_data])
-              content = Actions::Organizations.lookup(lookup_data)
+              content = Actions::Organizations.lookup(params[:lookup_data])
               status :ok
               body Oj.dump(content)
             end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Entrepreneurs
       class Update
@@ -8,6 +10,10 @@ module Cab
         PARAMS_SCHEMA = {
           type: :object,
           properties: {
+            id: {
+              type: :string,
+              pattern: UUID_FORMAT
+            },
             snils: {
               type: %i[string null],
               pattern: /\A[0-9]{3}-[0-9]{3}-[0-9]{3} [0-9]{2}\z/
@@ -122,7 +128,10 @@ module Cab
                 }
               }
             }
-          }
+          },
+          required: %i[
+            id
+          ]
         }.freeze
       end
     end

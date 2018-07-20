@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Cab
-  need 'actions/base/record_action'
+  need 'actions/base/action'
 
   module Actions
     module Organizations
       # Класс действий обновления полей записей юридических лиц
-      class Update < Base::RecordAction
+      class Update < Base::Action
         require_relative 'update/params_schema'
 
         # Обновляет поля записи юридического лица
@@ -17,6 +17,13 @@ module Cab
         end
 
         private
+
+        # Возвращает значение параметра `id`
+        # @return [String]
+        #   значение параметра `id`
+        def id
+          params[:id]
+        end
 
         # Возвращает запись юридического лица
         # @return [Cab::Models::Organization]

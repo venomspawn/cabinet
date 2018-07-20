@@ -3,13 +3,13 @@
 require 'securerandom'
 
 module Cab
-  need 'actions/base/record_action'
+  need 'actions/base/action'
 
   module Actions
     module Individuals
       # Класс действий создания записи документа, подтверждающего полномочия
       # представителя физического лица
-      class CreateVicariousAuthority < Base::RecordAction
+      class CreateVicariousAuthority < Base::Action
         require_relative 'create_vicarious_authority/params_schema'
 
         # Создаёт запись документа, подтверждающего полномочия представителя,
@@ -23,6 +23,13 @@ module Cab
         end
 
         private
+
+        # Возвращает значение параметра `id`
+        # @return [String]
+        #   значение параметра `id`
+        def id
+          params[:id]
+        end
 
         # Возвращает запись физического лица
         # @return [Cab::Models::Individual]

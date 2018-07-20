@@ -175,13 +175,13 @@ RSpec.describe Cab::Actions::Organizations do
   end
 
   describe '.create_vicarious_authority' do
-    subject(:result) { described_class.create_vicarious_authority(id, params) }
+    subject(:result) { described_class.create_vicarious_authority(params) }
 
     let(:id) { record.id }
     let(:record) { create(:organization) }
     let(:factory) { 'params/actions/organizations/create_vicarious_authority' }
-    let(:params) { create(factory, traits) }
-    let(:traits) { {} }
+    let(:params) { create(factory, *traits) }
+    let(:traits) { [id: id] }
 
     it 'should create a record of vicarious authority' do
       expect { subject }
@@ -215,7 +215,7 @@ RSpec.describe Cab::Actions::Organizations do
     end
 
     context 'when the record of spokesman isn\'t found' do
-      let(:traits) { { spokesman_id: create(:uuid) } }
+      let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)
@@ -234,7 +234,7 @@ RSpec.describe Cab::Actions::Organizations do
     end
 
     context 'when file isn\'t found' do
-      let(:traits) { { file_id: create(:uuid) } }
+      let(:traits) { [id: id, file_id: create(:uuid)] }
 
       it 'should raise Sequel::ForeignKeyConstraintViolation' do
         expect { subject }
@@ -254,7 +254,7 @@ RSpec.describe Cab::Actions::Organizations do
     end
 
     context 'when file belongs to other vicarious authority' do
-      let(:traits) { { file_id: file_id } }
+      let(:traits) { [id: id, file_id: file_id] }
       let(:file_id) { other_vicarious_authority.file_id }
       let!(:other_vicarious_authority) { create(:vicarious_authority) }
 
@@ -557,11 +557,11 @@ RSpec.describe Cab::Actions::Organizations do
   end
 
   describe '.update' do
-    subject(:result) { described_class.update(id, params) }
+    subject(:result) { described_class.update(params) }
 
     let(:id) { organization.id }
     let(:organization) { create(:organization) }
-    let(:params) { create('params/actions/organizations/update') }
+    let(:params) { create('params/actions/organizations/update', id: id) }
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { organization.reload.created_at }
@@ -594,24 +594,6 @@ RSpec.describe Cab::Actions::Organizations do
 
       expect(organization.bank_details.to_hash.symbolize_keys)
         .to be == params[:bank_details]
-    end
-
-    context 'when there is `id` property in params' do
-      let(:params) { create('params/actions/organizations/update', traits) }
-      let(:traits) { { id: new_id } }
-      let(:new_id) { create(:uuid) }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { organization.reload.id }
-      end
-    end
-
-    context 'when there is additional property in params' do
-      let(:params) { { additional: :property } }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { organization.reload.values }
-      end
     end
 
     context 'when params is of String type' do

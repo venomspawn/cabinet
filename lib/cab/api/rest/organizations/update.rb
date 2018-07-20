@@ -18,7 +18,7 @@ module Cab
             # @return [Status]
             #   204
             controller.put '/organizations/:id' do |id|
-              Actions::Organizations.update(id, request_body)
+              Actions::Organizations.update(request.body, id: id)
               status :no_content
             end
           end

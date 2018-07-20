@@ -8,12 +8,15 @@ module Cab
 
       # Создаёт запись физического лица и возвращает ассоциативный массив с
       # информацией о созданной записи
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.create(params)
-        Create.new(params).create
+      def self.create(params, rest = nil)
+        Create.new(params, rest).create
       end
 
       require_relative 'individuals/create_vicarious_authority'
@@ -21,59 +24,68 @@ module Cab
       # Создаёт запись документа, подтверждающего полномочия представителя,
       # создаёт запись связи между записями физического лица, представителя и
       # созданного документа
-      # @param [String] id
-      #   идентификатор записи физического лица
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
-      def self.create_vicarious_authority(id, params)
-        CreateVicariousAuthority.new(id, params).create
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
+      def self.create_vicarious_authority(params, rest = nil)
+        CreateVicariousAuthority.new(params, rest).create
       end
 
       require_relative 'individuals/lookup'
 
       # Возвращает ассоциативный массив с информацией о физических лицах
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.lookup(params)
-        Lookup.new(params).lookup
+      def self.lookup(params, rest = nil)
+        Lookup.new(params, rest).lookup
       end
 
       require_relative 'individuals/show'
 
       # Возвращает ассоциативный массив с информацией о физическом лице
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.show(params)
-        Show.new(params).show
+      def self.show(params, rest = nil)
+        Show.new(params, rest).show
       end
 
       require_relative 'individuals/update'
 
       # Обновляет поля записи физического лица
-      # @param [String] id
-      #   идентификатор записи
       # @param [Object] params
       #   объект с информацией о параметрах действия
-      def self.update(id, params)
-        Update.new(id, params).update
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
+      def self.update(params, rest = nil)
+        Update.new(params, rest).update
       end
 
       require_relative 'individuals/update_personal_info'
 
       # Обновляет персональные данные у записи физического лица и возвращает
       # ассоциативный массив с информацией о документе, удостоверяющем личность
-      # @param [String] id
-      #   идентификатор записи
       # @param [Object] params
       #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.update_personal_info(id, params)
-        UpdatePersonalInfo.new(id, params).update
+      def self.update_personal_info(params, rest = nil)
+        UpdatePersonalInfo.new(params, rest).update
       end
     end
   end

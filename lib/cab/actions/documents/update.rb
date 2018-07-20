@@ -12,7 +12,7 @@ module Cab
 
         # Обновляет содержимое файла документа, удостоверяющего личность
         def update
-          file.update(content: content)
+          file.update(content: read_content)
         end
 
         private
@@ -22,6 +22,13 @@ module Cab
         #   результирующее значение
         def id
           params[:id]
+        end
+
+        # Возвращает новое содержимое документа, удостоверяющего личность
+        # @return [String]
+        #   новое содержимое документа, удостоверяющего личность
+        def content
+          params[:content]
         end
 
         # Возвращает запись документа, удостоверяющего личность
@@ -42,11 +49,13 @@ module Cab
           Models::File.select(:id).with_pk(record.file_id)
         end
 
-        # Возвращает новое содержимое документа, удостоверяющего личность
+        # Возвращает содержимое файла
         # @return [String]
-        #   новое содержимое документа, удостоверяющего личность
-        def content
-          params[:content]
+        #   содержимое файла
+        def read_content
+          return content.to_s unless content.respond_to?(:read)
+          content.rewind if content.respond_to?(:rewind)
+          content.read.to_s
         end
       end
     end

@@ -21,8 +21,7 @@ module Cab
             # @return [Status]
             #   200
             controller.get '/individuals' do
-              lookup_data = Oj.load(params[:lookup_data])
-              content = Actions::Individuals.lookup(lookup_data)
+              content = Actions::Individuals.lookup(params[:lookup_data])
               status :ok
               body Oj.dump(content)
             end

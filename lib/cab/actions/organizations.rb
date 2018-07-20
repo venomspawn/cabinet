@@ -12,8 +12,8 @@ module Cab
       #   объект с информацией о параметрах действия
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.create(params)
-        Create.new(params).create
+      def self.create(params, rest = nil)
+        Create.new(params, rest).create
       end
 
       require_relative 'organizations/create_vicarious_authority'
@@ -21,12 +21,13 @@ module Cab
       # Создаёт запись документа, подтверждающего полномочия представителя,
       # создаёт запись связи между записями юридического лица, представителя и
       # созданного документа
-      # @param [String] id
-      #   идентификатор записи юридического лица
-      # @param [Hash] params
-      #   ассоциативный массив параметров действия
-      def self.create_vicarious_authority(id, params)
-        CreateVicariousAuthority.new(id, params).create
+      # @param [Object] params
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
+      def self.create_vicarious_authority(params, rest = nil)
+        CreateVicariousAuthority.new(params, rest).create
       end
 
       require_relative 'organizations/lookup'
@@ -34,10 +35,13 @@ module Cab
       # Возвращает ассоциативный массив с информацией о юридических лицах
       # @param [Object] params
       #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.lookup(params)
-        Lookup.new(params).lookup
+      def self.lookup(params, rest = nil)
+        Lookup.new(params, rest).lookup
       end
 
       require_relative 'organizations/show'
@@ -45,21 +49,25 @@ module Cab
       # Возвращает ассоциативный массив с информацией о юридическом лице
       # @param [Object] params
       #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [Hash]
       #   результирующий ассоциативный массив
-      def self.show(params)
-        Show.new(params).show
+      def self.show(params, rest = nil)
+        Show.new(params, rest).show
       end
 
       require_relative 'organizations/update'
 
       # Обновляет поля записи юридического лица
-      # @param [String] id
-      #   идентификатор записи
       # @param [Object] params
       #   объект с информацией о параметрах действия
-      def self.update(id, params)
-        Update.new(id, params).update
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
+      def self.update(params, rest = nil)
+        Update.new(params, rest).update
       end
     end
   end

@@ -464,13 +464,13 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   end
 
   describe '.create_vicarious_authority' do
-    subject(:result) { described_class.create_vicarious_authority(id, params) }
+    subject(:result) { described_class.create_vicarious_authority(params) }
 
     let(:id) { record.id }
     let(:record) { create(:entrepreneur) }
     let(:factory) { 'params/actions/entrepreneurs/create_vicarious_authority' }
-    let(:params) { create(factory, traits) }
-    let(:traits) { {} }
+    let(:params) { create(factory, *traits) }
+    let(:traits) { [id: id] }
 
     it 'should create a record of vicarious authority' do
       expect { subject }
@@ -504,7 +504,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     end
 
     context 'when the record of spokesman isn\'t found' do
-      let(:traits) { { spokesman_id: create(:uuid) } }
+      let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)
@@ -523,7 +523,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     end
 
     context 'when file isn\'t found' do
-      let(:traits) { { file_id: create(:uuid) } }
+      let(:traits) { [id: id, file_id: create(:uuid)] }
 
       it 'should raise Sequel::ForeignKeyConstraintViolation' do
         expect { subject }
@@ -543,7 +543,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     end
 
     context 'when file belongs to other vicarious authority' do
-      let(:traits) { { file_id: file_id } }
+      let(:traits) { [id: id, file_id: file_id] }
       let(:file_id) { other_vicarious_authority.file_id }
       let!(:other_vicarious_authority) { create(:vicarious_authority) }
 
@@ -886,12 +886,12 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   end
 
   describe '.update' do
-    subject(:result) { described_class.update(id, params) }
+    subject(:result) { described_class.update(params) }
 
     let(:id) { entrepreneur.id }
     let(:entrepreneur) { create(:entrepreneur) }
     let(:individual) { Cab::Models::Individual[entrepreneur.individual_id] }
-    let(:params) { create('params/actions/entrepreneurs/update') }
+    let(:params) { create('params/actions/entrepreneurs/update', id: id) }
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { entrepreneur.reload.created_at }
@@ -920,24 +920,6 @@ RSpec.describe Cab::Actions::Entrepreneurs do
 
       expect(individual.registration_address.to_hash.symbolize_keys)
         .to be == params[:registration_address]
-    end
-
-    context 'when there is `id` property in params' do
-      let(:params) { create('params/actions/entrepreneurs/update', traits) }
-      let(:traits) { { id: new_id } }
-      let(:new_id) { create(:uuid) }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { entrepreneur.reload.id }
-      end
-    end
-
-    context 'when there is additional property in params' do
-      let(:params) { { additional: :property } }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { entrepreneur.reload.values }
-      end
     end
 
     context 'when params is of String type' do
@@ -980,7 +962,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
   describe '.update_personal_info' do
     include described_class::UpdatePersonalInfo::SpecHelper
 
-    subject(:result) { described_class.update_personal_info(id, params) }
+    subject(:result) { described_class.update_personal_info(params) }
 
     let(:id) { entrepreneur.id }
     let(:entrepreneur) { create(:entrepreneur) }
@@ -988,7 +970,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     let(:individual_id) { entrepreneur.individual_id }
     let(:factory) { 'params/actions/entrepreneurs/update_personal_info' }
     let(:params) { create(factory, *traits) }
-    let(:traits) { [] }
+    let(:traits) { [id: id] }
 
     describe 'result' do
       subject { result }
@@ -1021,7 +1003,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     end
 
     context 'when file of identity document isn\'t found' do
-      let(:traits) { [identity_document: doc] }
+      let(:traits) { [id: id, identity_document: doc] }
       let(:doc) { create('params/identity_document', file_id: file_id) }
       let(:file_id) { create(:uuid) }
 
@@ -1039,7 +1021,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     end
 
     context 'when file of identity document belongs to other document' do
-      let(:traits) { [identity_document: doc] }
+      let(:traits) { [id: id, identity_document: doc] }
       let(:doc) { create('params/identity_document', file_id: file_id) }
       let(:file_id) { other_document.file_id }
       let!(:other_document) { create(:identity_document) }
@@ -1054,27 +1036,6 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           .to raise_error(Sequel::UniqueConstraintViolation)
           .and change { Cab::Models::IdentityDocument.count }
           .by(0)
-      end
-    end
-
-    context 'when there is `id` property in params' do
-      let(:params) { create(factory, traits) }
-      let(:traits) { { id: new_id } }
-      let(:new_id) { create(:uuid) }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { entrepreneur.reload.id }
-        expect { subject }.not_to change { individual.reload.id }
-      end
-    end
-
-    context 'when there is additional property in params' do
-      let(:params) { { identity_document: identity_document, some: :value } }
-      let(:identity_document) { create('params/identity_document') }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { entrepreneur.reload.values }
-        expect { subject }.not_to change { individual.reload.values }
       end
     end
 

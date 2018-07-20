@@ -21,7 +21,7 @@ module Cab
             # @return [Status]
             #   201
             controller.post '/organizations' do
-              content = Actions::Organizations.create(request_body)
+              content = Actions::Organizations.create(request.body)
               status :created
               body Oj.dump(content)
             end

@@ -18,7 +18,7 @@ module Cab
             # @return [Status]
             #   204
             controller.put '/individuals/:id' do |id|
-              Actions::Individuals.update(id, request_body)
+              Actions::Individuals.update(request.body, id: id)
               status :no_content
             end
           end

@@ -21,7 +21,7 @@ module Cab
             # @return [Status]
             #   201
             controller.post '/individuals' do
-              content = Actions::Individuals.create(request_body)
+              content = Actions::Individuals.create(request.body)
               status :created
               body Oj.dump(content)
             end

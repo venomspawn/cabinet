@@ -24,7 +24,7 @@ module Cab
             #   201
             controller.put '/individuals/:id/personal' do |id|
               content =
-                Actions::Individuals.update_personal_info(id, request_body)
+                Actions::Individuals.update_personal_info(request.body, id: id)
               status :created
               body Oj.dump(content)
             end

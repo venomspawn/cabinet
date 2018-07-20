@@ -10,8 +10,11 @@ module Cab
       # Обновляет содержимое файла документа, удостоверяющего личность
       # @param [Object] params
       #   объект с информацией о параметрах действия
-      def self.update(params)
-        Update.new(params).update
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
+      def self.update(params, rest = nil)
+        Update.new(params, rest).update
       end
     end
   end

@@ -10,6 +10,10 @@ module Cab
         PARAMS_SCHEMA = {
           type: :object,
           properties: {
+            id: {
+              type: :string,
+              pattern: UUID_FORMAT
+            },
             first_name: {
               type: :string
             },
@@ -84,6 +88,7 @@ module Cab
             }
           },
           required: %i[
+            id
             identity_document
           ]
         }.freeze

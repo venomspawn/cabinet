@@ -10,7 +10,7 @@ module Cab
       # ассоциативный массив с информацией о записи
       # @param [#read, #to_s] content
       #   содержимое, которое может быть представлено потоком или извлечено с
-      #   помощью `#to_s`
+      #   помощью метода `#to_s`
       # @return [Hash]
       #   результирующий ассоциативный массив
       def self.create(content)
@@ -21,24 +21,30 @@ module Cab
 
       # Возвращает содержимое файла
       # @param [Object] params
-      #   параметры действия
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @return [String]
       #   содержимое файла
       # @raise [Sequel::NoMatchingRow]
       #   если запись файла не найдена по предоставленному идентификатору
-      def self.show(params)
-        Show.new(params).show
+      def self.show(params, rest = nil)
+        Show.new(params, rest).show
       end
 
       require_relative 'files/update'
 
       # Обновляет содержимое файла
       # @param [Object] params
-      #   параметры действия
+      #   объект с информацией о параметрах действия
+      # @param [NilClass, Hash{Symbol => Object}] rest
+      #   ассоциативный массив дополнительных параметров действия или `nil`,
+      #   если дополнительные параметры отсутствуют
       # @raise [Sequel::NoMatchingRow]
       #   если запись файла не найдена по предоставленному идентификатору
-      def self.update(params)
-        Update.new(params).update
+      def self.update(params, rest = nil)
+        Update.new(params, rest).update
       end
     end
   end
