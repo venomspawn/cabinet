@@ -44,24 +44,13 @@ RSpec.describe Cab::Actions::Organizations do
       let(:traits) { [spokesman: spokesman] }
       let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::Organization.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::OrganizationSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              Organization
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when file of vicarious authority isn\'t found' do
@@ -69,29 +58,13 @@ RSpec.describe Cab::Actions::Organizations do
       let!(:spokesman) { create('params/spokesman', file_id: file_id) }
       let(:file_id) { create(:uuid) }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::Individual.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[
+                              Organization
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when file of vicarious authority belongs to other record' do
@@ -100,29 +73,13 @@ RSpec.describe Cab::Actions::Organizations do
       let(:file_id) { other_vicarious_authority.file_id }
       let(:other_vicarious_authority) { create(:vicarious_authority) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::Individual.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[
+                              Organization
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when params is of String type' do
@@ -198,59 +155,34 @@ RSpec.describe Cab::Actions::Organizations do
     context 'when the record of organization isn\'t found' do
       let(:id) { create(:uuid) }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::OrganizationSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when the record of spokesman isn\'t found' do
       let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::OrganizationSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when file isn\'t found' do
       let(:traits) { [id: id, file_id: create(:uuid)] }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when file belongs to other vicarious authority' do
@@ -258,20 +190,12 @@ RSpec.describe Cab::Actions::Organizations do
       let(:file_id) { other_vicarious_authority.file_id }
       let!(:other_vicarious_authority) { create(:vicarious_authority) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              OrganizationSpokesman
+                            ]
     end
 
     context 'when params is of String type' do

@@ -49,33 +49,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       context 'when file of agreement isn\'t found' do
         let(:traits) { [:with_individual, agreement_id: create(:uuid)] }
 
-        it 'should raise Sequel::ForeignKeyConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::Entrepreneur.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::EntrepreneurSpokesman.count }
-            .by(0)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::ForeignKeyConstraintViolation,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                Entrepreneur
+                                VicariousAuthority
+                                EntrepreneurSpokesman
+                              ]
       end
 
       context 'when file of agreement belongs to other individual record' do
@@ -83,33 +65,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         let(:agreement_id) { other_individual.agreement_id }
         let!(:other_individual) { create(:individual) }
 
-        it 'should raise Sequel::UniqueConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::Entrepreneur.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::EntrepreneurSpokesman.count }
-            .by(0)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::UniqueConstraintViolation,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                Entrepreneur
+                                VicariousAuthority
+                                EntrepreneurSpokesman
+                              ]
       end
 
       context 'when file of identity document isn\'t found' do
@@ -117,33 +81,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         let(:doc) { create('params/identity_document', file_id: file_id) }
         let(:file_id) { create(:uuid) }
 
-        it 'should raise Sequel::ForeignKeyConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::Entrepreneur.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::EntrepreneurSpokesman.count }
-            .by(0)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::ForeignKeyConstraintViolation,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                Entrepreneur
+                                VicariousAuthority
+                                EntrepreneurSpokesman
+                              ]
       end
 
       context 'when file of identity document belongs to other document' do
@@ -152,33 +98,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
         let(:file_id) { other_document.file_id }
         let!(:other_document) { create(:identity_document) }
 
-        it 'should raise Sequel::UniqueConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::Entrepreneur.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::EntrepreneurSpokesman.count }
-            .by(0)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::UniqueConstraintViolation,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                Entrepreneur
+                                VicariousAuthority
+                                EntrepreneurSpokesman
+                              ]
       end
 
       context 'when there is information about spokesman' do
@@ -201,32 +129,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let(:args) { { spokesman: spokesman } }
           let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-          it 'should raise Sequel::NoMatchingRow' do
-            expect { subject }.to raise_error(Sequel::NoMatchingRow)
-          end
-
-          it 'shouldn\'t create records' do
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::Individual.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::IdentityDocument.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::Entrepreneur.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::VicariousAuthority.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::EntrepreneurSpokesman.count }
-              .by(0)
-          end
+          it_should_behave_like 'a transactional action',
+                                error: Sequel::NoMatchingRow,
+                                shouldnt_create: %i[
+                                  Individual
+                                  IdentityDocument
+                                  Entrepreneur
+                                  VicariousAuthority
+                                  EntrepreneurSpokesman
+                                ]
         end
 
         context 'when file of vicarious authority isn\'t found' do
@@ -235,33 +146,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let!(:spokesman) { create('params/spokesman', file_id: file_id) }
           let(:file_id) { create(:uuid) }
 
-          it 'should raise Sequel::ForeignKeyConstraintViolation' do
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          end
-
-          it 'shouldn\'t create records' do
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::Individual.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::IdentityDocument.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::Entrepreneur.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::VicariousAuthority.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::EntrepreneurSpokesman.count }
-              .by(0)
-          end
+          it_should_behave_like 'a transactional action',
+                                error: Sequel::ForeignKeyConstraintViolation,
+                                shouldnt_create: %i[
+                                  Individual
+                                  IdentityDocument
+                                  Entrepreneur
+                                  VicariousAuthority
+                                  EntrepreneurSpokesman
+                                ]
         end
 
         context 'when file of vicarious authority belongs to other record' do
@@ -271,33 +164,15 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let(:file_id) { other_vicarious_authority.file_id }
           let(:other_vicarious_authority) { create(:vicarious_authority) }
 
-          it 'should raise Sequel::UniqueConstraintViolation' do
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-          end
-
-          it 'shouldn\'t create records' do
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::Individual.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::IdentityDocument.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::Entrepreneur.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::VicariousAuthority.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::EntrepreneurSpokesman.count }
-              .by(0)
-          end
+          it_should_behave_like 'a transactional action',
+                                error: Sequel::UniqueConstraintViolation,
+                                shouldnt_create: %i[
+                                  Individual
+                                  IdentityDocument
+                                  Entrepreneur
+                                  VicariousAuthority
+                                  EntrepreneurSpokesman
+                                ]
         end
       end
     end
@@ -337,24 +212,13 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let(:args) { { spokesman: spokesman } }
           let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-          it 'should raise Sequel::NoMatchingRow' do
-            expect { subject }.to raise_error(Sequel::NoMatchingRow)
-          end
-
-          it 'shouldn\'t create records' do
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::Entrepreneur.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::VicariousAuthority.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::NoMatchingRow)
-              .and change { Cab::Models::EntrepreneurSpokesman.count }
-              .by(0)
-          end
+          it_should_behave_like 'a transactional action',
+                                error: Sequel::NoMatchingRow,
+                                shouldnt_create: %i[
+                                  Entrepreneur
+                                  VicariousAuthority
+                                  EntrepreneurSpokesman
+                                ]
         end
 
         context 'when file of vicarious authority isn\'t found' do
@@ -363,25 +227,13 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let!(:spokesman) { create('params/spokesman', file_id: file_id) }
           let(:file_id) { create(:uuid) }
 
-          it 'should raise Sequel::ForeignKeyConstraintViolation' do
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          end
-
-          it 'shouldn\'t create records' do
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::Entrepreneur.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::VicariousAuthority.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::ForeignKeyConstraintViolation)
-              .and change { Cab::Models::EntrepreneurSpokesman.count }
-              .by(0)
-          end
+          it_should_behave_like 'a transactional action',
+                                error: Sequel::ForeignKeyConstraintViolation,
+                                shouldnt_create: %i[
+                                  Entrepreneur
+                                  VicariousAuthority
+                                  EntrepreneurSpokesman
+                                ]
         end
 
         context 'when file of vicarious authority belongs to other record' do
@@ -391,25 +243,13 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let(:file_id) { other_vicarious_authority.file_id }
           let(:other_vicarious_authority) { create(:vicarious_authority) }
 
-          it 'should raise Sequel::UniqueConstraintViolation' do
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-          end
-
-          it 'shouldn\'t create records' do
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::Entrepreneur.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::VicariousAuthority.count }
-              .by(0)
-            expect { subject }
-              .to raise_error(Sequel::UniqueConstraintViolation)
-              .and change { Cab::Models::EntrepreneurSpokesman.count }
-              .by(0)
-          end
+          it_should_behave_like 'a transactional action',
+                                error: Sequel::UniqueConstraintViolation,
+                                shouldnt_create: %i[
+                                  Entrepreneur
+                                  VicariousAuthority
+                                  EntrepreneurSpokesman
+                                ]
         end
       end
     end
@@ -487,59 +327,34 @@ RSpec.describe Cab::Actions::Entrepreneurs do
     context 'when the record of entrepreneur isn\'t found' do
       let(:id) { create(:uuid) }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              EntrepreneurSpokesman
+                            ]
     end
 
     context 'when the record of spokesman isn\'t found' do
       let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              EntrepreneurSpokesman
+                            ]
     end
 
     context 'when file isn\'t found' do
       let(:traits) { [id: id, file_id: create(:uuid)] }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              EntrepreneurSpokesman
+                            ]
     end
 
     context 'when file belongs to other vicarious authority' do
@@ -547,20 +362,12 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       let(:file_id) { other_vicarious_authority.file_id }
       let!(:other_vicarious_authority) { create(:vicarious_authority) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              EntrepreneurSpokesman
+                            ]
     end
 
     context 'when params is of String type' do
@@ -1007,17 +814,9 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       let(:doc) { create('params/identity_document', file_id: file_id) }
       let(:file_id) { create(:uuid) }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create record of identity document of the individual' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[IdentityDocument]
     end
 
     context 'when file of identity document belongs to other document' do
@@ -1026,17 +825,9 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       let(:file_id) { other_document.file_id }
       let!(:other_document) { create(:identity_document) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create record of identity document of the individual' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[IdentityDocument]
     end
 
     context 'when params is of String type' do
