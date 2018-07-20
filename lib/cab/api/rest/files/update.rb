@@ -14,7 +14,7 @@ module Cab
             # @return [Status]
             #   204
             controller.put '/files/:id' do |id|
-              Actions::Files.update(id: id, content: request_body)
+              Actions::Files.update(id: id, content: request.body)
               status :no_content
             end
           end

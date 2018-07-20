@@ -24,7 +24,7 @@ module Cab
             #   204
             controller.post '/entrepreneurs/:id/vicarious_authority' do |id|
               Actions::Entrepreneurs
-                .create_vicarious_authority(id, request_body)
+                .create_vicarious_authority(request.body, id: id)
               status :no_content
             end
           end

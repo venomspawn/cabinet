@@ -22,7 +22,7 @@ module Cab
             # @return [Status]
             #   201
             controller.post '/entrepreneurs' do
-              content = Actions::Entrepreneurs.create(request_body)
+              content = Actions::Entrepreneurs.create(request.body)
               status :created
               body Oj.dump(content)
             end

@@ -12,7 +12,8 @@ module Cab
         # сервиса
         module Show
           # Содержимое результата запроса на версию сервиса
-          BODY = Oj.dump(version: Cab::VERSION, hostname: `hostname`.strip)
+          BODY =
+            Oj.dump(version: Cab::VERSION, hostname: `hostname`.strip).freeze
 
           # Регистрация в контроллере необходимых путей
           # @param [Cab::API::REST::Controller] controller

@@ -13,15 +13,6 @@ module Cab
         CONTENT_TYPE = 'application/json; charset=utf-8'
 
         before { content_type CONTENT_TYPE }
-
-        # Возвращает строку с телом запроса
-        # @return [String]
-        #   строка с телом запроса
-        def request_body
-          body = request.body
-          body.rewind
-          body.read
-        end
       end
     end
   end

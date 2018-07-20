@@ -3,13 +3,13 @@
 require 'securerandom'
 
 module Cab
-  need 'actions/base/record_action'
+  need 'actions/base/action'
 
   module Actions
     module Entrepreneurs
       # Класс действий обновления персональных данных у записи индивидуального
       # предпринимателя
-      class UpdatePersonalInfo < Base::RecordAction
+      class UpdatePersonalInfo < Base::Action
         require_relative 'update_personal_info/params_schema'
 
         # Обновляет персональные данные у записи индивидуального
@@ -26,6 +26,13 @@ module Cab
         end
 
         private
+
+        # Возвращает значение параметра `id`
+        # @return [String]
+        #   значение параметра `id`
+        def id
+          params[:id]
+        end
 
         # Возвращает запись индивидуального предпринимателя
         # @return [Cab::Models::Entrepreneur]

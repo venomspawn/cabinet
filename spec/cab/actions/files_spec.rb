@@ -62,13 +62,15 @@ RSpec.describe Cab::Actions::Files do
   end
 
   describe '.show' do
-    subject(:result) { described_class.show(params) }
+    subject(:result) { described_class.show(params, rest) }
 
-    file_id = '12345678-1234-1234-1234-123456789012'
-
-    let(:params) { { id: id } }
+    let(:params) { data }
+    let(:data) { { id: id } }
     let(:id) { file.id }
-    let!(:file) { create(:file, id: file_id) }
+    let(:file) { create(:file) }
+    let(:rest) { nil }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
@@ -90,14 +92,16 @@ RSpec.describe Cab::Actions::Files do
   end
 
   describe '.update' do
-    subject { described_class.update(params) }
+    subject { described_class.update(params, rest) }
 
-    file_id = '12345678-1234-1234-1234-123456789012'
-
-    let(:params) { { id: id, content: content } }
+    let(:params) { data }
+    let(:data) { { id: id, content: content } }
     let(:content) { 'content' }
     let(:id) { file.id }
-    let!(:file) { create(:file, id: file_id) }
+    let!(:file) { create(:file) }
+    let(:rest) { nil }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     context 'when `content` responds to #read' do
       let(:content) { StringIO.new(str) }

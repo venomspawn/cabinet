@@ -20,10 +20,14 @@ RSpec.describe Cab::Actions::Individuals do
   describe '.create' do
     include described_class::Create::SpecHelper
 
-    subject(:result) { described_class.create(params) }
+    subject(:result) { described_class.create(params, rest) }
 
+    let(:rest) { nil }
     let(:params) { create('params/actions/individuals/create', *traits) }
+    let(:data) { create('params/actions/individuals/create') }
     let(:traits) { [] }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
@@ -44,29 +48,14 @@ RSpec.describe Cab::Actions::Individuals do
     context 'when file of agreement isn\'t found' do
       let(:traits) { [agreement_id: create(:uuid)] }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::Individual.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[
+                              Individual
+                              IdentityDocument
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when file of agreement belongs to other individual record' do
@@ -74,29 +63,14 @@ RSpec.describe Cab::Actions::Individuals do
       let(:agreement_id) { other_individual.agreement_id }
       let!(:other_individual) { create(:individual) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::Individual.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[
+                              Individual
+                              IdentityDocument
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when file of identity document isn\'t found' do
@@ -104,29 +78,14 @@ RSpec.describe Cab::Actions::Individuals do
       let(:doc) { create('params/identity_document', file_id: file_id) }
       let(:file_id) { create(:uuid) }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::Individual.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[
+                              Individual
+                              IdentityDocument
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when file of identity document belongs to other document' do
@@ -135,29 +94,14 @@ RSpec.describe Cab::Actions::Individuals do
       let(:file_id) { other_document.file_id }
       let!(:other_document) { create(:identity_document) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::Individual.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[
+                              Individual
+                              IdentityDocument
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when there is information about spokesman' do
@@ -179,28 +123,14 @@ RSpec.describe Cab::Actions::Individuals do
         let(:traits) { [:with_spokesman, spokesman: spokesman] }
         let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-        it 'should raise Sequel::NoMatchingRow' do
-          expect { subject }.to raise_error(Sequel::NoMatchingRow)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::NoMatchingRow)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::NoMatchingRow)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::NoMatchingRow)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::NoMatchingRow)
-            .and change { Cab::Models::IndividualSpokesman.count }
-            .by(0)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::NoMatchingRow,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                VicariousAuthority
+                                IndividualSpokesman
+                              ]
       end
 
       context 'when file of vicarious authority isn\'t found' do
@@ -208,29 +138,14 @@ RSpec.describe Cab::Actions::Individuals do
         let!(:spokesman) { create('params/spokesman', file_id: file_id) }
         let(:file_id) { create(:uuid) }
 
-        it 'should raise Sequel::ForeignKeyConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::ForeignKeyConstraintViolation)
-            .and change { Cab::Models::IndividualSpokesman.count }
-            .by(0)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::ForeignKeyConstraintViolation,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                VicariousAuthority
+                                IndividualSpokesman
+                              ]
       end
 
       context 'when file of vicarious authority belongs to other record' do
@@ -240,89 +155,31 @@ RSpec.describe Cab::Actions::Individuals do
         let(:file_id) { other_vicarious_authority.file_id }
         let(:other_vicarious_authority) { create(:vicarious_authority) }
 
-        it 'should raise Sequel::UniqueConstraintViolation' do
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-        end
-
-        it 'shouldn\'t create records' do
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::Individual.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::IdentityDocument.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::VicariousAuthority.count }
-            .by(0)
-          expect { subject }
-            .to raise_error(Sequel::UniqueConstraintViolation)
-            .and change { Cab::Models::IndividualSpokesman.count }
-            .by(0)
-        end
-      end
-    end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::UniqueConstraintViolation,
+                              shouldnt_create: %i[
+                                Individual
+                                IdentityDocument
+                                VicariousAuthority
+                                IndividualSpokesman
+                              ]
       end
     end
   end
 
   describe '.create_vicarious_authority' do
-    subject(:result) { described_class.create_vicarious_authority(id, params) }
+    subject(:result) { described_class.create_vicarious_authority(*args) }
 
+    let(:args) { [params, rest] }
+    let(:rest) { nil }
     let(:id) { record.id }
     let(:record) { create(:individual) }
     let(:factory) { 'params/actions/individuals/create_vicarious_authority' }
-    let(:params) { create(factory, traits) }
-    let(:traits) { {} }
+    let(:params) { create(factory, *traits) }
+    let(:traits) { [id: id] }
+    let(:data) { create(factory, id: id) }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     it 'should create a record of vicarious authority' do
       expect { subject }
@@ -339,135 +196,64 @@ RSpec.describe Cab::Actions::Individuals do
     context 'when the record of individual isn\'t found' do
       let(:id) { create(:uuid) }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when the record of spokesman isn\'t found' do
-      let(:traits) { { spokesman_id: create(:uuid) } }
+      let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
       it 'should raise Sequel::NoMatchingRow' do
         expect { subject }.to raise_error(Sequel::NoMatchingRow)
       end
 
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::NoMatchingRow)
-          .and change { Cab::Models::IndividualSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::NoMatchingRow,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when file isn\'t found' do
-      let(:traits) { { file_id: create(:uuid) } }
+      let(:traits) { [id: id, file_id: create(:uuid)] }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
 
     context 'when file belongs to other vicarious authority' do
-      let(:traits) { { file_id: file_id } }
+      let(:traits) { [id: id, file_id: file_id] }
       let(:file_id) { other_vicarious_authority.file_id }
       let!(:other_vicarious_authority) { create(:vicarious_authority) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }.to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create records' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::VicariousAuthority.count }
-          .by(0)
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::EntrepreneurSpokesman.count }
-          .by(0)
-      end
-    end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[
+                              VicariousAuthority
+                              IndividualSpokesman
+                            ]
     end
   end
 
   describe '.lookup' do
     include described_class::Lookup::SpecHelper
 
-    subject(:result) { described_class.lookup(params) }
+    subject(:result) { described_class.lookup(params, rest) }
+
+    let(:rest) { nil }
+    let(:data) { { first_name: create(:string) } }
+
+    it_should_behave_like 'an action parameters receiver',
+                          wrong_structure: { first_name: 1 }
 
     describe 'result' do
       subject { result }
@@ -573,67 +359,24 @@ RSpec.describe Cab::Actions::Individuals do
         end
       end
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
   end
 
   describe '.show' do
     include described_class::Show::SpecHelper
 
-    subject(:result) { described_class.show(params) }
+    subject(:result) { described_class.show(params, rest) }
+
+    let(:rest) { nil }
+    let(:data) { { id: id } }
+    let(:id) { individual.id }
+    let(:individual) { create(:individual) }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
 
       let(:params) { { id: id, extended: extended } }
-      let(:id) { individual.id }
-      let(:individual) { create(:individual) }
       let!(:identity_documents) { create_list(:identity_document, 2, traits) }
       let(:traits) { { individual_id: id } }
 
@@ -679,70 +422,18 @@ RSpec.describe Cab::Actions::Individuals do
         end
       end
     end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params represents a map' do
-          context 'when the map is of wrong structure' do
-            let(:params) { Oj.dump(wrong: :structure) }
-
-            it 'should raise JSON::Schema::ValidationError' do
-              expect { subject }.to raise_error(JSON::Schema::ValidationError)
-            end
-          end
-        end
-
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is of Hash type' do
-      context 'when params is of wrong structure' do
-        let(:params) { { wrong: :structure } }
-
-        it 'should raise JSON::Schema::ValidationError' do
-          expect { subject }.to raise_error(JSON::Schema::ValidationError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
-
-    context 'when the record can\'t be found' do
-      let(:params) { { id: create(:uuid) } }
-
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-    end
   end
 
   describe '.update' do
-    subject(:result) { described_class.update(id, params) }
+    subject(:result) { described_class.update(params, rest) }
 
+    let(:rest) { nil }
     let(:id) { individual.id }
     let(:individual) { create(:individual) }
-    let(:params) { create('params/actions/individuals/update') }
+    let(:params) { data }
+    let(:data) { create('params/actions/individuals/update', id: id) }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     it 'shouldn\'t update `created_at` field' do
       expect { subject }.not_to change { individual.reload.created_at }
@@ -761,72 +452,22 @@ RSpec.describe Cab::Actions::Individuals do
       expect(individual.residence_address.to_hash.symbolize_keys)
         .to be == params[:residential_address]
     end
-
-    context 'when there is `id` property in params' do
-      let(:params) { create('params/actions/individuals/update', traits) }
-      let(:traits) { { id: new_id } }
-      let(:new_id) { create(:uuid) }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { individual.reload.id }
-      end
-    end
-
-    context 'when there is additional property in params' do
-      let(:params) { { additional: :property } }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { individual.reload.values }
-      end
-    end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
-
-    context 'when the record can\'t be found' do
-      let(:id) { create(:uuid) }
-
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-    end
   end
 
   describe '.update_personal_info' do
     include described_class::UpdatePersonalInfo::SpecHelper
 
-    subject(:result) { described_class.update_personal_info(id, params) }
+    subject(:result) { described_class.update_personal_info(params, rest) }
 
+    let(:rest) { nil }
     let(:id) { individual.id }
     let(:individual) { create(:individual) }
     let(:params_factory) { 'params/actions/individuals/update_personal_info' }
     let(:params) { create(params_factory, *traits) }
-    let(:traits) { [] }
+    let(:data) { create(params_factory, id: id) }
+    let(:traits) { [id: id] }
+
+    it_should_behave_like 'an action parameters receiver', wrong_structure: {}
 
     describe 'result' do
       subject { result }
@@ -858,95 +499,24 @@ RSpec.describe Cab::Actions::Individuals do
     end
 
     context 'when file of identity document isn\'t found' do
-      let(:traits) { [identity_document: doc] }
+      let(:traits) { [id: id, identity_document: doc] }
       let(:doc) { create('params/identity_document', file_id: file_id) }
       let(:file_id) { create(:uuid) }
 
-      it 'should raise Sequel::ForeignKeyConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-      end
-
-      it 'shouldn\'t create record of identity document of the individual' do
-        expect { subject }
-          .to raise_error(Sequel::ForeignKeyConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::ForeignKeyConstraintViolation,
+                            shouldnt_create: %i[IdentityDocument]
     end
 
     context 'when file of identity document belongs to other document' do
-      let(:traits) { [identity_document: doc] }
+      let(:traits) { [id: id, identity_document: doc] }
       let(:doc) { create('params/identity_document', file_id: file_id) }
       let(:file_id) { other_document.file_id }
       let!(:other_document) { create(:identity_document) }
 
-      it 'should raise Sequel::UniqueConstraintViolation' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-      end
-
-      it 'shouldn\'t create record of identity document of the individual' do
-        expect { subject }
-          .to raise_error(Sequel::UniqueConstraintViolation)
-          .and change { Cab::Models::IdentityDocument.count }
-          .by(0)
-      end
-    end
-
-    context 'when there is `id` property in params' do
-      let(:params) { create(params_factory, traits) }
-      let(:traits) { { id: new_id } }
-      let(:new_id) { create(:uuid) }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { individual.reload.id }
-      end
-    end
-
-    context 'when there is additional property in params' do
-      let(:params) { { identity_document: identity_document, some: :value } }
-      let(:identity_document) { create('params/identity_document') }
-
-      it 'should ignore it' do
-        expect { subject }.not_to change { individual.reload.values }
-      end
-    end
-
-    context 'when params is of String type' do
-      context 'when params is a JSON-string' do
-        context 'when params does not represent a map' do
-          let(:params) { Oj.dump(%w[not a map]) }
-
-          it 'should raise JSON::Schema::ValidationError' do
-            expect { subject }.to raise_error(JSON::Schema::ValidationError)
-          end
-        end
-      end
-
-      context 'when params is not a JSON-string' do
-        let(:params) { 'not a JSON-string' }
-
-        it 'should raise Oj::ParseError' do
-          expect { subject }.to raise_error(Oj::ParseError)
-        end
-      end
-    end
-
-    context 'when params is not of Hash type nor of String type' do
-      let(:params) { %w[not of Hash type nor of String type] }
-
-      it 'should raise JSON::Schema::ValidationError' do
-        expect { subject }.to raise_error(JSON::Schema::ValidationError)
-      end
-    end
-
-    context 'when the record can\'t be found' do
-      let(:id) { create(:uuid) }
-
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
+      it_should_behave_like 'a transactional action',
+                            error: Sequel::UniqueConstraintViolation,
+                            shouldnt_create: %i[IdentityDocument]
     end
   end
 end

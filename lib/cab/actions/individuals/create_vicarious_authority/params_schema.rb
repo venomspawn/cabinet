@@ -10,6 +10,10 @@ module Cab
         PARAMS_SCHEMA = {
           type: :object,
           properties: {
+            id: {
+              type: :string,
+              pattern: UUID_FORMAT
+            },
             spokesman_id: {
               type: :string,
               pattern: UUID_FORMAT
@@ -41,6 +45,7 @@ module Cab
             }
           },
           required: %i[
+            id
             spokesman_id
             title
             issued_by

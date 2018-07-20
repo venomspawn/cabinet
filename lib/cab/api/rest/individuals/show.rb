@@ -23,8 +23,7 @@ module Cab
             # @return [Status]
             #   200
             controller.get '/individuals/:id' do |id|
-              extended = params[:extended]
-              content = Actions::Individuals.show(id: id, extended: extended)
+              content = Actions::Individuals.show(request.GET, id: id)
               status :ok
               body Oj.dump(content)
             end

@@ -18,7 +18,7 @@ module Cab
             # @return [Status]
             #   200
             controller.put '/entrepreneurs/:id' do |id|
-              Actions::Entrepreneurs.update(id, request_body)
+              Actions::Entrepreneurs.update(request.body, id: id)
               status :no_content
             end
           end
