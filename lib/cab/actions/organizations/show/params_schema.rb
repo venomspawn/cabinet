@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Organizations
       class Show
-        # Выражение для шестнадцатеричной цифры
-        HEX = '[a-fA-F0-9]'
-
-        # Регулярное выражение для проверки на формат UUID
-        UUID_FORMAT = /\A#{HEX}{8}-#{HEX}{4}-#{HEX}{4}-#{HEX}{4}-#{HEX}{12}\z/
-
         # JSON-схема параметров действия
         PARAMS_SCHEMA = {
           type: :object,

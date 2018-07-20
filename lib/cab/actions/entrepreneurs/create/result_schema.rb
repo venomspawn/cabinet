@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Entrepreneurs
       class Create
@@ -9,10 +11,12 @@ module Cab
           type: :object,
           properties: {
             id: {
-              type: :string
+              type: :string,
+              pattern: UUID_FORMAT
             },
             identity_document_id: {
-              type: :string
+              type: :string,
+              pattern: UUID_FORMAT
             }
           },
           required: %i[

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module Cab
+  need 'actions/uuid_format'
+
   module Actions
     module Organizations
       class Lookup
@@ -18,7 +20,8 @@ module Cab
                     enum: %w[organization]
                   },
                   id: {
-                    type: :string
+                    type: :string,
+                    pattern: UUID_FORMAT
                   },
                   full_name: {
                     type: :string
@@ -46,7 +49,8 @@ module Cab
                     enum: %w[organization]
                   },
                   id: {
-                    type: :string
+                    type: :string,
+                    pattern: UUID_FORMAT
                   },
                   full_name: {
                     type: :string
@@ -74,7 +78,8 @@ module Cab
                     enum: %w[organization]
                   },
                   id: {
-                    type: :string
+                    type: :string,
+                    pattern: UUID_FORMAT
                   },
                   full_name: {
                     type: :string
