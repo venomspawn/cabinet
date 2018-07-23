@@ -12,21 +12,21 @@ Sequel.migration do
                   type:      :uuid,
                   null:      false,
                   index:     true,
-                  on_delete: :cascade,
+                  on_delete: :restrict,
                   on_update: :cascade
 
       foreign_key :individual_id, :individuals,
                   type:      :uuid,
                   null:      false,
                   index:     true,
-                  on_delete: :cascade,
+                  on_delete: :restrict,
                   on_update: :cascade
 
       foreign_key :vicarious_authority_id, :vicarious_authorities,
                   type:      :uuid,
                   null:      false,
                   index:     true,
-                  on_delete: :cascade,
+                  on_delete: :restrict,
                   on_update: :cascade
 
       primary_key %i[spokesman_id individual_id vicarious_authority_id],

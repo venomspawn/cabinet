@@ -24,31 +24,6 @@ module Cab
 
         private
 
-        # Возвращает значение параметра `id`
-        # @return [String]
-        #   значение параметра `id`
-        def id
-          params[:id]
-        end
-
-        # Возвращает запись индивидуального предпринимателя
-        # @return [Cab::Models::Entrepreneur]
-        #   запись индивидуального предпринимателя
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись индивидуального предпринимателя не найдена
-        def record
-          Models::Entrepreneur.select(:id).with_pk!(id)
-        end
-
-        # Возвращает запись представителя
-        # @return [Cab::Models::Individual]
-        #   запись представителя
-        # @raise [Sequel::NoMatchingRow]
-        #   если запись представителя не найдена
-        def spokesman
-          Models::Individual.select(:id).with_pk!(params[:spokesman_id])
-        end
-
         # Создаёт и возвращает запись документа, подтверждающего полномочия
         # представителя индивидуального предпринимателя
         # @return [Cab::Models::VicariousAuthority]
@@ -90,6 +65,16 @@ module Cab
           create_unrestricted(:EntrepreneurSpokesman, link_params)
         end
 
+        # Ассоциативный массив, в котором сопоставляются названия полей записи
+        # связи между записями индивидуального предпринимателя и его
+        # представителя и способы извлечения значений этих полей из параметров
+        # действия
+        LINK_FIELDS = {
+          created_at:      Time.method(:now),
+          spokesman_id:    :spokesman_id,
+          entrepreneur_id: :id
+        }.freeze
+
         # Возвращает ассоциативный массив полей записи связи между записями
         # индивидуального предпринимателя и его представителя
         # @param [Cab::Models::VicariousAuthority] vicarious_authority
@@ -97,12 +82,9 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def entrepreneur_spokesman_params(vicarious_authority)
-          {
-            created_at:             Time.now,
-            spokesman_id:           spokesman.id,
-            entrepreneur_id:        record.id,
-            vicarious_authority_id: vicarious_authority.id
-          }
+          extract_params(LINK_FIELDS).tap do |hash|
+            hash[:vicarious_authority_id] = vicarious_authority.id
+          end
         end
       end
     end

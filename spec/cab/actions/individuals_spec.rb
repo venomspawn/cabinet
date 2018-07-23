@@ -124,7 +124,7 @@ RSpec.describe Cab::Actions::Individuals do
         let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
         it_should_behave_like 'a transactional action',
-                              error: Sequel::NoMatchingRow,
+                              error: Sequel::ForeignKeyConstraintViolation,
                               shouldnt_create: %i[
                                 Individual
                                 IdentityDocument
@@ -197,7 +197,7 @@ RSpec.describe Cab::Actions::Individuals do
       let(:id) { create(:uuid) }
 
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               VicariousAuthority
                               IndividualSpokesman
@@ -207,12 +207,8 @@ RSpec.describe Cab::Actions::Individuals do
     context 'when the record of spokesman isn\'t found' do
       let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
-      it 'should raise Sequel::NoMatchingRow' do
-        expect { subject }.to raise_error(Sequel::NoMatchingRow)
-      end
-
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               VicariousAuthority
                               IndividualSpokesman

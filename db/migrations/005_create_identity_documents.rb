@@ -33,7 +33,7 @@ Sequel.migration do
       foreign_key :individual_id, :individuals,
                   type:      :uuid,
                   null:      false,
-                  on_delete: :cascade,
+                  on_delete: :restrict,
                   on_update: :cascade
 
       foreign_key :file_id, :files,
