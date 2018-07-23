@@ -233,7 +233,9 @@ module Cab
         def create_unrestricted(model_name, creation_params)
           model = Models.const_get(model_name)
           model.unrestrict_primary_key
-          model.create(creation_params).tap { model.restrict_primary_key }
+          model.create(creation_params)
+        ensure
+          model.restrict_primary_key
         end
       end
     end

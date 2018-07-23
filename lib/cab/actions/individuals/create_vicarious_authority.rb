@@ -70,7 +70,7 @@ module Cab
         # извлечения значений этих полей из параметров действия
         LINK_FIELDS = {
           created_at:    Time.method(:now),
-          spokesman_id   :spokesman_id,
+          spokesman_id:  :spokesman_id,
           individual_id: :id
         }.freeze
 

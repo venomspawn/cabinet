@@ -26,13 +26,13 @@ RSpec.describe Cab::API::REST::Entrepreneurs::CreateVicariousAuthority do
     context 'when the record of entrepreneur isn\'t found' do
       let(:id) { create(:uuid) }
 
-      it { is_expected.to be_not_found }
+      it { is_expected.to be_unprocessable }
     end
 
     context 'when the record of spokesman isn\'t found' do
       let(:traits) { { spokesman_id: create(:uuid) } }
 
-      it { is_expected.to be_not_found }
+      it { is_expected.to be_unprocessable }
     end
 
     context 'when request body is a JSON-string' do

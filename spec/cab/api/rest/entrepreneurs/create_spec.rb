@@ -30,7 +30,7 @@ RSpec.describe Cab::API::REST::Entrepreneurs::Create do
         let(:args) { { spokesman: spokesman } }
         let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-        it { is_expected.to be_not_found }
+        it { is_expected.to be_unprocessable }
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe Cab::API::REST::Entrepreneurs::Create do
       context 'when the record of individual isn\'t found' do
         let(:traits) { [:with_individual_id, individual_id: create(:uuid)] }
 
-        it { is_expected.to be_not_found }
+        it { is_expected.to be_unprocessable }
       end
     end
 

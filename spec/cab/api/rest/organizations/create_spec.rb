@@ -25,7 +25,7 @@ RSpec.describe Cab::API::REST::Organizations::Create do
       let(:traits) { { spokesman: spokesman } }
       let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-      it { is_expected.to be_not_found }
+      it { is_expected.to be_unprocessable }
     end
 
     context 'when request body is a JSON-string' do

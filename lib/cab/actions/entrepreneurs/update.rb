@@ -52,18 +52,17 @@ module Cab
         # Ассоциативный массив, отображающий названия ключей ассоциативного
         # массива атрибутов записи физического лица в названия ключей
         # ассоциативного массива параметров
-        INDIVIDUAL_FIELDS = {
-          snils:                :snils,
-          inn:                  :inn,
-          registration_address: :registration_address
-        }.freeze
+        INDIVIDUAL_FIELDS = { snils: :snils, inn: :inn, }.freeze
 
         # Возвращает ассоциативный массив параметров обновления записи
         # физического лица
         # @return [Hash]
         #   результирующий ассоциативный массив
         def individual_params
-          extract_params(INDIVIDUAL_FIELDS)
+          extract_params(INDIVIDUAL_FIELDS).tap do |hash|
+            hash[:registration_address] =
+              Oj.dump(params[:registration_address])
+          end
         end
 
         # Ассоциативный массив, отображающий названия ключей ассоциативного

@@ -49,7 +49,7 @@ RSpec.describe Cab::Actions::Organizations do
       let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               Organization
                               VicariousAuthority
@@ -117,7 +117,7 @@ RSpec.describe Cab::Actions::Organizations do
       let(:id) { create(:uuid) }
 
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               VicariousAuthority
                               OrganizationSpokesman
@@ -128,7 +128,7 @@ RSpec.describe Cab::Actions::Organizations do
       let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               VicariousAuthority
                               OrganizationSpokesman

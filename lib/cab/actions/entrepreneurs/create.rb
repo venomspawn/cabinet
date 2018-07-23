@@ -17,10 +17,11 @@ module Cab
         #   результирующий ассоциативный массив
         def create
           Sequel::Model.db.transaction(savepoint: true) do
-            individual_id = process_individual_id
-            record = create_entrepreneur(individual_id)
+            individual = process_individual
+            record = create_entrepreneur(individual[:id])
             vicarious_authority = create_vicarious_authority
             create_entrepreneur_spokesman(record, vicarious_authority)
+            individual.tap { individual[:id] = record.id }
           end
         end
 
@@ -42,13 +43,15 @@ module Cab
           params[:individual_id]
         end
 
-        # Создаёт запись физического лица и возвращает её идентификатор, если
-        # значение параметра `individual_id` не указано, в противном случае
-        # возвращает значение параметра `individual_id`
-        # @return [String]
-        #   результирующее значение
-        def process_individual_id
-          individual_id || Individuals.create(individual_params).id
+        # Создаёт запись физического лица и возвращает ассоциативный массив с
+        # информацией о ней, если значение параметра `individual_id` не
+        # указано, в противном случае возвращает ассоциативный массив со
+        # значением параметра `individual_id`
+        # @return [Hash]
+        #   результирующий ассоциативный массив
+        def process_individual
+          return Individuals.create(individual_params) if individual_id.nil?
+          { id: individual_id }
         end
 
         # Ассоциативный массив, отображающий названия ключей ассоциативного
@@ -83,7 +86,7 @@ module Cab
         #   идентификатор записи физического лица
         # @return [Cab::Models::Entrepreneur]
         #   созданная запись
-        def create_entrepreneur(individual)
+        def create_entrepreneur(individual_id)
           record_params = entrepreneur_params(individual_id)
           create_unrestricted(:Entrepreneur, record_params)
         end
@@ -106,7 +109,7 @@ module Cab
         #   идентификатор записи физического лица
         # @return [Hash]
         #   результирующий ассоциативный массив
-        def entrepreneur_params(individual)
+        def entrepreneur_params(individual_id)
           extract_params(ENTREPRENEUR_FIELDS).tap do |hash|
             hash[:individual_id] = individual_id
           end

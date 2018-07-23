@@ -59,7 +59,6 @@ module Cab
           surname:     :last_name,
           middle_name: :middle_name,
           birth_place: :birth_place,
-          birthday:    :birth_date,
           sex:         :sex,
           citizenship: :citizenship
         }.freeze
@@ -68,7 +67,10 @@ module Cab
         # @return [Hash]
         #   результирующий ассоциативный массив
         def individual_params
-          extract_params(INDIVIDUAL_FIELDS)
+          extract_params(INDIVIDUAL_FIELDS).tap do |hash|
+            # '20.07.2018' ~> '2018-07-20'
+            hash[:birthday] = params[:birth_date].split('.').reverse.join('-')
+          end
         end
 
         # Создаёт запись документа, удостоверяющего личность физического лица

@@ -26,7 +26,7 @@ RSpec.describe Cab::API::REST::Individuals::Create do
         let(:traits) { [:with_spokesman, spokesman: spokesman] }
         let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
-        it { is_expected.to be_not_found }
+        it { is_expected.to be_unprocessable }
       end
     end
 

@@ -134,7 +134,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
           it_should_behave_like 'a transactional action',
-                                error: Sequel::NoMatchingRow,
+                                error: Sequel::ForeignKeyConstraintViolation,
                                 shouldnt_create: %i[
                                   Individual
                                   IdentityDocument
@@ -191,9 +191,13 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       context 'when the record of individual isn\'t found' do
         let(:traits) { [:with_individual_id, individual_id: create(:uuid)] }
 
-        it 'should raise Sequel::NoMatchingRow' do
-          expect { subject }.to raise_error(Sequel::NoMatchingRow)
-        end
+        it_should_behave_like 'a transactional action',
+                              error: Sequel::ForeignKeyConstraintViolation,
+                              shouldnt_create: %i[
+                                Entrepreneur
+                                VicariousAuthority
+                                EntrepreneurSpokesman
+                              ]
       end
 
       context 'when there is information about spokesman' do
@@ -217,7 +221,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
           let(:spokesman) { create('params/spokesman', id: create(:uuid)) }
 
           it_should_behave_like 'a transactional action',
-                                error: Sequel::NoMatchingRow,
+                                error: Sequel::ForeignKeyConstraintViolation,
                                 shouldnt_create: %i[
                                   Entrepreneur
                                   VicariousAuthority
@@ -289,7 +293,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       let(:id) { create(:uuid) }
 
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               VicariousAuthority
                               EntrepreneurSpokesman
@@ -300,7 +304,7 @@ RSpec.describe Cab::Actions::Entrepreneurs do
       let(:traits) { [id: id, spokesman_id: create(:uuid)] }
 
       it_should_behave_like 'a transactional action',
-                            error: Sequel::NoMatchingRow,
+                            error: Sequel::ForeignKeyConstraintViolation,
                             shouldnt_create: %i[
                               VicariousAuthority
                               EntrepreneurSpokesman
